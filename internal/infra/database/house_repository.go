@@ -24,6 +24,7 @@ type house struct {
 }
 
 type HouseRepository interface {
+	Save(h domain.House) (domain.House, error)
 }
 
 type houseRepository struct {
@@ -39,5 +40,47 @@ func NewHouseRepository(sess db.Session) HouseRepository {
 }
 
 func (r houseRepository) Save(h domain.House) (domain.House, error) {
+	hs := r.mapDomainToModel(h)
+	hs.CreatedDate = time.Now()
+	hs.UpdatedDate = time.Now()
 
+	err := r.coll.InsertReturning(&hs)
+	if err != nil {
+		return domain.House{}, err
+	}
+
+	h = r.mapModelToDomain(hs)
+	return h, nil
+}
+
+func (r houseRepository) mapDomainToModel(d domain.House) house {
+	return house{
+		Id:          d.Id,
+		UserId:      d.UserId,
+		Name:        d.Name,
+		Description: d.Description,
+		City:        d.City,
+		Address:     d.Address,
+		Lat:         d.Lat,
+		Lon:         d.Lon,
+		CreatedDate: d.CreatedDate,
+		UpdatedDate: d.UpdatedDate,
+		DeletedDate: d.DeletedDate,
+	}
+}
+
+func (r houseRepository) mapModelToDomain(d house) domain.House {
+	return domain.House{
+		Id:          d.Id,
+		UserId:      d.UserId,
+		Name:        d.Name,
+		Description: d.Description,
+		City:        d.City,
+		Address:     d.Address,
+		Lat:         d.Lat,
+		Lon:         d.Lon,
+		CreatedDate: d.CreatedDate,
+		UpdatedDate: d.UpdatedDate,
+		DeletedDate: d.DeletedDate,
+	}
 }
