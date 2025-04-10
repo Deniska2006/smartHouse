@@ -10,7 +10,7 @@ import (
 const HousesTableName = "houses"
 
 type house struct {
-	Id          uint64     `db:"id"`
+	Id          uint64     `db:"id,omitempty"`
 	UserId      uint64     `db:"user_id"`
 	Name        string     `db:"name"`
 	Description *string    `db:"description"`
@@ -53,6 +53,34 @@ func (r houseRepository) Save(h domain.House) (domain.House, error) {
 	return h, nil
 }
 
+func (r houseRepository) FindList(uId uint64) ([]domain.House, error) {
+	var houses []house
+	err := r.coll.
+		Find(db.Cond{
+			"user_id":      uId,
+			"deleted_date": nil}).All(&houses)
+	if err != nil {
+		return nil, err
+	}
+
+	hs := r.mapModelToDomainCollection(houses)
+	return hs, nil
+}
+
+func (r houseRepository) Find(id uint64) (domain.House, error) {
+	var h house
+	err := r.coll.
+		Find(db.Cond{
+			"id":           id,
+			"deleted_date": nil}).One(&h)
+	if err != nil {
+		return domain.House{}, err
+	}
+
+	hs := r.mapModelToDomain(h)
+	return hs, nil
+}
+
 func (r houseRepository) mapDomainToModel(d domain.House) house {
 	return house{
 		Id:          d.Id,
@@ -83,4 +111,13 @@ func (r houseRepository) mapModelToDomain(d house) domain.House {
 		UpdatedDate: d.UpdatedDate,
 		DeletedDate: d.DeletedDate,
 	}
+}
+
+func (r houseRepository) mapModelToDomainCollection(houses []house) []domain.House {
+	hs := make([]domain.House, len(houses))
+	for i, h := range houses {
+		hs[i] = r.mapModelToDomain(h)
+	}
+
+	return hs
 }
