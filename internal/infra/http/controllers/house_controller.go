@@ -45,3 +45,12 @@ func (c HouseController) Save() http.HandlerFunc {
 		Success(w, houseDto)
 	}
 }
+
+func (c HouseController) Find() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		house := r.Context().Value(HouseKey).(domain.House)
+		var houseDto resources.HouseDto
+		houseDto = houseDto.DomainToDto(house)
+		Success(w, houseDto)
+	}
+}

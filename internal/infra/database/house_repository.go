@@ -25,6 +25,8 @@ type house struct {
 
 type HouseRepository interface {
 	Save(h domain.House) (domain.House, error)
+	FindList(uId uint64) ([]domain.House, error)
+	Find(id uint64) (domain.House, error)
 }
 
 type houseRepository struct {
