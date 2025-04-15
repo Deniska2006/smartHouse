@@ -116,6 +116,10 @@ func HouseRouter(r chi.Router, hc controllers.HouseController, hs app.HouseServi
 			"/{houseId}",
 			hc.Find(),
 		)
+		apiRouter.Get(
+			"/",
+			hc.FindList(),
+		)
 	})
 }
 

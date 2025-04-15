@@ -35,3 +35,11 @@ func (d HouseDto) DomainToDto(h domain.House) HouseDto {
 		DeletedDate: h.DeletedDate,
 	}
 }
+
+func (d HouseDto) DomainToDtoCollection(houses []domain.House) []HouseDto {
+	hs := make([]HouseDto, len(houses))
+	for i, house := range houses {
+		hs[i] = d.DomainToDto(house)
+	}
+	return hs
+}
