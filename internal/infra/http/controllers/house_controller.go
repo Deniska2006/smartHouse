@@ -46,14 +46,38 @@ func (c HouseController) Save() http.HandlerFunc {
 	}
 }
 
+func (c HouseController) Update() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		updt, err := requests.BindToMap(r, requests.UpdateHouseRequest{})
+		if err != nil {
+			log.Printf("HouseController.Update(requests.BindBindToMap): %s", err)
+			BadRequest(w, errors.New("invalid request body"))
+			return
+		}
+
+		house := r.Context().Value(HouseKey).(domain.House)
+
+		house, err = c.houseService.Update(updt, house)
+		if err != nil {
+			log.Printf("HouseController.Update(c.houseService.Update): %s", err)
+			InternalServerError(w, err)
+			return
+		}
+
+		var houseDto resources.HouseDto
+		houseDto = houseDto.DomainToDto(house)
+		Success(w, houseDto)
+	}
+}
+
 func (c HouseController) Find() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		house := r.Context().Value(HouseKey).(domain.House)
 		user := r.Context().Value(UserKey).(domain.User)
 
-		if house.UserId != user.Id{
+		if house.UserId != user.Id {
 			err := errors.New("Acces denied")
-			Forbidden(w,err)
+			Forbidden(w, err)
 			return
 		}
 
@@ -67,14 +91,12 @@ func (c HouseController) FindList() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user := r.Context().Value(UserKey).(domain.User)
 
-		houses,err := c.houseService.FindList(user.Id)
-		if err != nil{
-			log.Printf("(HouseController) FindList( c.houseService.FindList(user.Id)): %s",err)
-			InternalServerError(w,err)
+		houses, err := c.houseService.FindList(user.Id)
+		if err != nil {
+			log.Printf("(HouseController) FindList( c.houseService.FindList(user.Id)): %s", err)
+			InternalServerError(w, err)
 		}
 
-		
 		Success(w, resources.HouseDto{}.DomainToDtoCollection(houses))
 	}
 }
-

@@ -120,6 +120,10 @@ func HouseRouter(r chi.Router, hc controllers.HouseController, hs app.HouseServi
 			"/",
 			hc.FindList(),
 		)
+		apiRouter.With(hpom).Put(
+			"/{houseId}",
+			hc.Update(),
+		)
 	})
 }
 

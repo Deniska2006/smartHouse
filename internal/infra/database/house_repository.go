@@ -27,6 +27,7 @@ type HouseRepository interface {
 	Save(h domain.House) (domain.House, error)
 	FindList(uId uint64) ([]domain.House, error)
 	Find(id uint64) (domain.House, error)
+	Update(updt map[string]interface{}, h domain.House) (domain.House, error)
 }
 
 type houseRepository struct {
@@ -53,6 +54,28 @@ func (r houseRepository) Save(h domain.House) (domain.House, error) {
 
 	h = r.mapModelToDomain(hs)
 	return h, nil
+}
+
+func (r houseRepository) Update(updt map[string]interface{}, h domain.House) (domain.House, error) {
+
+	err := r.coll.Find(db.Cond{"id": h.Id}).Update(map[string]interface{}{
+		"updated_date": time.Now(),
+	})
+	if err != nil {
+		return domain.House{}, err
+	}
+
+	for parametr, value := range updt {
+
+		err = r.coll.Find(db.Cond{"id": h.Id}).Update(map[string]interface{}{
+			parametr: value,
+		})
+		if err != nil {
+			return domain.House{}, err
+		}
+	}
+
+	return r.mapModelToDomainUpdate(updt, h), nil
 }
 
 func (r houseRepository) FindList(uId uint64) ([]domain.House, error) {
@@ -122,4 +145,31 @@ func (r houseRepository) mapModelToDomainCollection(houses []house) []domain.Hou
 	}
 
 	return hs
+}
+
+func (r houseRepository) mapModelToDomainUpdate(updt map[string]interface{}, h domain.House) domain.House {
+	var result domain.House = h
+	for k, v := range updt {
+		if k == "name" {
+			result.Name = v.(string)
+		}
+		if k == "description" {
+			d := v.(string)
+			result.Description = &d
+
+		}
+		if k == "city" {
+			result.City = v.(string)
+		}
+		if k == "address" {
+			result.Address = v.(string)
+		}
+		if k == "lat" {
+			result.Lat = v.(float64)
+		}
+		if k == "lon" {
+			result.Lon = v.(float64)
+		}
+	}
+	return result
 }

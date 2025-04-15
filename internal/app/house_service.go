@@ -12,6 +12,7 @@ type HouseService interface {
 	Find(id uint64) (interface{}, error)
 	FindById(id uint64) (domain.House, error)
 	FindList(uId uint64) ([]domain.House, error)
+	Update(updt map[string]interface{}, h domain.House) (domain.House, error)
 }
 
 type houseService struct {
@@ -28,6 +29,16 @@ func (s houseService) Save(h domain.House) (domain.House, error) {
 	house, err := s.houseRepo.Save(h)
 	if err != nil {
 		log.Printf("houseService.Save(s.houseRepo.Save): %s", err)
+		return domain.House{}, err
+	}
+
+	return house, nil
+}
+
+func (s houseService) Update(updt map[string]interface{}, h domain.House) (domain.House, error) {
+	house, err := s.houseRepo.Update(updt,h)
+	if err != nil {
+		log.Printf("houseService.Update(s.houseRepo.Update): %s", err)
 		return domain.House{}, err
 	}
 

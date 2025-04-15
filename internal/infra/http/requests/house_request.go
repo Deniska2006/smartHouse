@@ -14,7 +14,7 @@ type HouseRequest struct {
 type UpdateHouseRequest struct {
 	Name        *string  `json:"name"`
 	Description *string  `json:"description"`
-	City        *string  `json:"city" `
+	City        *string  `json:"city"`
 	Address     *string  `json:"address"`
 	Lat         *float64 `json:"lat"`
 	Lon         *float64 `json:"lon"`
@@ -49,7 +49,6 @@ func (r UpdateHouseRequest) ToDomainModel() (interface{}, error) {
 	if r.Lon != nil {
 		lon = *r.Lon
 	}
-	
 
 	return domain.House{
 		Name:        name,
