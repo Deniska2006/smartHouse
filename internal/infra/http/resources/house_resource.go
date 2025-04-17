@@ -20,6 +20,10 @@ type HouseDto struct {
 	DeletedDate *time.Time `json:"deletedDate,omitempty"`
 }
 
+type Message struct {
+	Response string
+}
+
 func (d HouseDto) DomainToDto(h domain.House) HouseDto {
 	return HouseDto{
 		Id:          h.Id,

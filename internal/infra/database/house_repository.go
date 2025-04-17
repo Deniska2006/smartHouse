@@ -28,6 +28,7 @@ type HouseRepository interface {
 	FindList(uId uint64) ([]domain.House, error)
 	Find(id uint64) (domain.House, error)
 	Update(updt map[string]interface{}, h domain.House) (domain.House, error)
+	Delete(hId uint64) error
 }
 
 type houseRepository struct {
@@ -65,6 +66,17 @@ func (r houseRepository) Update(updt map[string]interface{}, h domain.House) (do
 	}
 
 	return r.mapModelToDomainUpdate(updt, h), nil
+}
+
+func (r houseRepository) Delete(hId uint64) error {
+	err := r.coll.Find(db.Cond{"id": hId}).Update(map[string]interface{}{
+		"deleted_date": time.Now(),
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r houseRepository) FindList(uId uint64) ([]domain.House, error) {

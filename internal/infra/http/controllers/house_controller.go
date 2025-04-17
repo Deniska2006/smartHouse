@@ -70,6 +70,21 @@ func (c HouseController) Update() http.HandlerFunc {
 	}
 }
 
+func (c HouseController) Delete() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		house := r.Context().Value(HouseKey).(domain.House)
+
+		err := c.houseService.Delete(house.Id)
+		if err != nil {
+			log.Printf("HouseController.Delete(c.houseService.Delete): %s", err)
+			InternalServerError(w, err)
+			return
+		}
+
+		Success(w, resources.Message{Response: "House was deleted"})
+	}
+}
+
 func (c HouseController) Find() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		house := r.Context().Value(HouseKey).(domain.House)
