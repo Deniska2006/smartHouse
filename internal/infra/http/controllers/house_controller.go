@@ -48,7 +48,7 @@ func (c HouseController) Save() http.HandlerFunc {
 
 func (c HouseController) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		updt, err := requests.BindToMap(r, requests.UpdateHouseRequest{})
+		updt, err := requests.Bind(r, requests.UpdateHouseRequest{}, domain.House{})
 		if err != nil {
 			log.Printf("HouseController.Update(requests.BindToMap): %s", err)
 			BadRequest(w, errors.New("invalid request body"))

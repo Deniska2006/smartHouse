@@ -27,7 +27,7 @@ type HouseRepository interface {
 	Save(h domain.House) (domain.House, error)
 	FindList(uId uint64) ([]domain.House, error)
 	Find(id uint64) (domain.House, error)
-	Update(updt map[string]interface{}, h domain.House) (domain.House, error)
+	Update(updt domain.House, h domain.House) (domain.House, error)
 	Delete(hId uint64) error
 }
 
@@ -57,10 +57,9 @@ func (r houseRepository) Save(h domain.House) (domain.House, error) {
 	return h, nil
 }
 
-func (r houseRepository) Update(updt map[string]interface{}, h domain.House) (domain.House, error) {
-	updt["updated_date"] = time.Now()
+func (r houseRepository) Update(updt domain.House, h domain.House) (domain.House, error) {
 
-	err := r.coll.Find(db.Cond{"id": h.Id}).Update(updt)
+	err := r.coll.Find(db.Cond{"id": h.Id}).Update(r.mapDomainToModelUpdate(updt, h))
 	if err != nil {
 		return domain.House{}, err
 	}
@@ -123,6 +122,23 @@ func (r houseRepository) mapDomainToModel(d domain.House) house {
 	}
 }
 
+func (r houseRepository) mapDomainToModelUpdate(updt domain.House, h domain.House) house {
+	return house{
+		Id:          h.Id,
+		UserId:      h.UserId,
+		Name:        updt.Name,
+		Description: updt.Description,
+		City:        updt.City,
+		Address:     updt.Address,
+		Lat:         updt.Lat,
+		Lon:         updt.Lon,
+		CreatedDate: h.CreatedDate,
+		UpdatedDate: time.Now(),
+		DeletedDate: h.DeletedDate,
+	}
+}
+	
+
 func (r houseRepository) mapModelToDomain(d house) domain.House {
 	return domain.House{
 		Id:          d.Id,
@@ -148,24 +164,25 @@ func (r houseRepository) mapModelToDomainCollection(houses []house) []domain.Hou
 	return hs
 }
 
-func (r houseRepository) mapModelToDomainUpdate(updt map[string]interface{}, h domain.House) domain.House {
-	var result domain.House = h
-	for k, v := range updt {
-		switch k {
-		case "name":
-			result.Name = v.(string)
-		case "description":
-			d := v.(string)
-			result.Description = &d
-		case "city":
-			result.City = v.(string)
-		case "address":
-			result.Address = v.(string)
-		case "lat":
-			result.Lat = v.(float64)
-		case "lon":
-			result.Lon = v.(float64)
-		}
+func (r houseRepository) mapModelToDomainUpdate(updt domain.House, h domain.House) domain.House {
+	if updt.Name != h.Name {
+		h.Name = updt.Name
 	}
-	return result
+	if updt.Description != h.Description {
+		h.Description = updt.Description
+	}
+	if updt.City != h.City {
+		h.City = updt.City
+	}
+	if updt.Address != h.Address {
+		h.Address = updt.Address
+	}
+	if updt.Lat != h.Lat {
+		h.Lat = updt.Lat
+	}
+	if updt.Lon != h.Lon {
+		h.Lon = updt.Lon
+	}
+	h.UpdatedDate = time.Now()
+	return h
 }
