@@ -53,6 +53,7 @@ func Router(cont container.Container) http.Handler {
 
 				UserRouter(apiRouter, cont.UserController)
 				HouseRouter(apiRouter, cont.HouseController, cont.HouseService)
+				RoomRouter(apiRouter, cont.RoomController, cont.HouseService)
 
 				apiRouter.Handle("/*", NotFoundJSON())
 			})
@@ -128,6 +129,18 @@ func HouseRouter(r chi.Router, hc controllers.HouseController, hs app.HouseServi
 			"/{houseId}",
 			hc.Delete(),
 		)
+	})
+}
+
+func RoomRouter(r chi.Router, rc controllers.RoomController, hs app.HouseService) {
+	hpom := middlewares.PathObject("houseId", controllers.HouseKey, hs)
+
+	r.Route("/houses/{houseId}/rooms", func(apiRouter chi.Router) {
+		apiRouter.With(hpom).Post(
+			"/",
+			rc.Save(),
+		)
+
 	})
 }
 

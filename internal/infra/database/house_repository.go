@@ -58,7 +58,6 @@ func (r houseRepository) Save(h domain.House) (domain.House, error) {
 }
 
 func (r houseRepository) Update(updt domain.House, h domain.House) (domain.House, error) {
-
 	err := r.coll.Find(db.Cond{"id": h.Id}).Update(r.mapDomainToModelUpdate(updt))
 	if err != nil {
 		return domain.House{}, err
@@ -122,22 +121,6 @@ func (r houseRepository) mapDomainToModel(d domain.House) house {
 	}
 }
 
-// func (r houseRepository) mapDomainToModelUpdate(updt domain.House, h domain.House) house {
-// 	return house{
-// 		Id:          h.Id,
-// 		UserId:      h.UserId,
-// 		Name:        updt.Name,
-// 		Description: updt.Description,
-// 		City:        updt.City,
-// 		Address:     updt.Address,
-// 		Lat:         updt.Lat,
-// 		Lon:         updt.Lon,
-// 		CreatedDate: h.CreatedDate,
-// 		UpdatedDate: time.Now(),
-// 		DeletedDate: h.DeletedDate,
-// 	}
-// }
-
 func (r houseRepository) mapDomainToModelUpdate(updt domain.House) map[string]interface{} {
 	result := make(map[string]interface{},1)
 	if updt.Name != "" {
@@ -188,22 +171,22 @@ func (r houseRepository) mapModelToDomainCollection(houses []house) []domain.Hou
 }
 
 func (r houseRepository) mapModelToDomainUpdate(updt domain.House, h domain.House) domain.House {
-	if updt.Name != h.Name {
+	if updt.Name != h.Name && updt.Name != "" {
 		h.Name = updt.Name
 	}
-	if updt.Description != h.Description {
+	if updt.Description != h.Description && updt.Description != nil {
 		h.Description = updt.Description
 	}
-	if updt.City != h.City {
+	if updt.City != h.City && updt.City != "" {
 		h.City = updt.City
 	}
-	if updt.Address != h.Address {
+	if updt.Address != h.Address && updt.Address != "" {
 		h.Address = updt.Address
 	}
-	if updt.Lat != h.Lat {
+	if updt.Lat != h.Lat && updt.Lat != 0 {
 		h.Lat = updt.Lat
 	}
-	if updt.Lon != h.Lon {
+	if updt.Lon != h.Lon && updt.Lon != 0 {
 		h.Lon = updt.Lon
 	}
 	h.UpdatedDate = time.Now()
