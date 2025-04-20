@@ -10,7 +10,6 @@ import (
 type HouseService interface {
 	Save(h domain.House) (domain.House, error)
 	Find(id uint64) (interface{}, error)
-	FindById(id uint64) (domain.House, error)
 	FindList(uId uint64) ([]domain.House, error)
 	Update(updt domain.House, h domain.House) (domain.House, error)
 	Delete(hId uint64) error
@@ -57,16 +56,6 @@ func (s houseService) Delete(hId uint64) error {
 }
 
 func (s houseService) Find(id uint64) (interface{}, error) {
-	house, err := s.houseRepo.Find(id)
-	if err != nil {
-		log.Printf("houseService.Find(s.houseRepo.Find): %s", err)
-		return domain.House{}, err
-	}
-
-	return house, nil
-}
-
-func (s houseService) FindById(id uint64) (domain.House, error) {
 	house, err := s.houseRepo.Find(id)
 	if err != nil {
 		log.Printf("houseService.Find(s.houseRepo.Find): %s", err)

@@ -59,3 +59,12 @@ func (c RoomController) FindList() http.HandlerFunc {
 		Success(w, resources.RoomDto{}.DomainToDtoCollection(rooms))
 	}
 }
+
+func (c RoomController) Find() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		room := r.Context().Value(RoomKey).(domain.Room)
+		var roomDto resources.RoomDto
+		roomDto = roomDto.DomainToDto(room)
+		Success(w, roomDto)
+	}
+}

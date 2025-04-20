@@ -18,6 +18,7 @@ var (
 	UserKey  = CtxKey{Name: "user"}
 	SessKey  = CtxKey{Name: "sess"}
 	HouseKey = CtxKey{Name: "house"}
+	RoomKey  = CtxKey{Name: "room"}
 )
 
 func Ok(w http.ResponseWriter) {
