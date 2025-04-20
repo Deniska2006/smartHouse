@@ -135,10 +135,14 @@ func HouseRouter(r chi.Router, hc controllers.HouseController, hs app.HouseServi
 func RoomRouter(r chi.Router, rc controllers.RoomController, hs app.HouseService) {
 	hpom := middlewares.PathObject("houseId", controllers.HouseKey, hs)
 
-	r.Route("/houses/{houseId}/rooms", func(apiRouter chi.Router) {
+	r.Route("/houses/rooms", func(apiRouter chi.Router) {
 		apiRouter.With(hpom).Post(
-			"/",
+			"/{houseId}",
 			rc.Save(),
+		)
+		apiRouter.With(hpom).Get(
+			"/{houseId}",
+			rc.FindList(),
 		)
 
 	})

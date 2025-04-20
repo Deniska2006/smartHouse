@@ -45,3 +45,17 @@ func (c RoomController) Save() http.HandlerFunc {
 		Success(w, roomDto)
 	}
 }
+
+func (c RoomController) FindList() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		house := r.Context().Value(HouseKey).(domain.House)
+
+		rooms, err := c.roomService.FindList(house.Id)
+		if err != nil {
+			log.Printf("RoomController.FindList(c.roomService.FindList): %s", err)
+			InternalServerError(w, err)
+			return
+		}
+		Success(w, resources.RoomDto{}.DomainToDtoCollection(rooms))
+	}
+}

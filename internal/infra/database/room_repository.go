@@ -21,6 +21,7 @@ type room struct {
 
 type RoomRepository interface {
 	Save(rm domain.Room) (domain.Room, error)
+	FindList(hId uint64) ([]domain.Room, error)
 }
 
 type roomRepository struct {
@@ -46,6 +47,27 @@ func (r roomRepository) Save(rm domain.Room) (domain.Room, error) {
 	}
 
 	return r.mapModelToDomain(room), nil
+}
+
+func (r roomRepository) FindList(hId uint64) ([]domain.Room, error) {
+	var rooms []room
+	err := r.coll.
+		Find(db.Cond{
+			"house_id":     hId,
+			"deleted_date": nil}).All(&rooms)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.mapModelToDomainCollection(rooms), nil
+}
+
+func (r roomRepository) mapModelToDomainCollection(rooms []room) []domain.Room {
+	rs := make([]domain.Room, len(rooms))
+	for i, rm := range rooms {
+		rs[i] = r.mapModelToDomain(rm)
+	}
+	return rs
 }
 
 func (r roomRepository) mapDomainToModel(rm domain.Room) room {

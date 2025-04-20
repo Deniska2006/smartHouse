@@ -9,6 +9,7 @@ import (
 
 type RoomService interface {
 	Save(rm domain.Room) (domain.Room, error)
+	FindList(hId uint64) ([]domain.Room, error)
 }
 
 type roomService struct {
@@ -29,4 +30,14 @@ func (s roomService) Save(rm domain.Room) (domain.Room, error) {
 	}
 
 	return house, nil
+}
+
+func (s roomService) FindList(hId uint64) ([]domain.Room, error) {
+	rooms, err := s.roomRepo.FindList(hId)
+	if err != nil {
+		log.Printf("roomService.FindList(s.roomRepo.FindList): %s", err)
+		return nil, err
+	}
+
+	return rooms, nil
 }

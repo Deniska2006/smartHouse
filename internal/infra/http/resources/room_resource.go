@@ -27,3 +27,11 @@ func (d RoomDto) DomainToDto(r domain.Room) RoomDto {
 		DeletedDate: r.DeletedDate,
 	}
 }
+
+func (d RoomDto) DomainToDtoCollection(rooms []domain.Room) []RoomDto {
+	rs := make([]RoomDto, len(rooms))
+	for i, room := range rooms {
+		rs[i] = d.DomainToDto(room)
+	}
+	return rs
+}
