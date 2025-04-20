@@ -23,6 +23,8 @@ type RoomRepository interface {
 	Save(rm domain.Room) (domain.Room, error)
 	FindList(hId uint64) ([]domain.Room, error)
 	Find(Id uint64) (domain.Room, error)
+	Update(updt domain.Room, rm domain.Room)(domain.Room,error)
+	Delete(rId uint64) error
 }
 
 type roomRepository struct {
@@ -74,6 +76,49 @@ func (r roomRepository) Find(Id uint64) (domain.Room, error) {
 	}
 
 	return r.mapModelToDomain(rm), nil
+}
+
+func (r roomRepository) Update(updt domain.Room, rm domain.Room)(domain.Room,error) {
+	err := r.coll.Find(db.Cond{"id": rm.Id}).Update(r.mapDomainToModelUpdate(updt))
+	if err != nil {
+		return domain.Room{}, err
+	}
+
+	return r.mapModelToDomainUpdate(updt,rm), nil
+}
+
+func (r roomRepository) Delete(rId uint64) error {
+	err := r.coll.Find(db.Cond{"id": rId}).Update(map[string]interface{}{
+		"deleted_date" : time.Now(),
+	})
+	if err != nil {
+		return  err
+	}
+
+	return nil
+}
+
+func (r roomRepository) mapModelToDomainUpdate(updt domain.Room, rm domain.Room) domain.Room {
+	if updt.Name != rm.Name && updt.Name != "" {
+		rm.Name = updt.Name
+	}
+	if updt.Description != rm.Description && updt.Description != nil {
+		rm.Description = updt.Description
+	}
+	rm.UpdatedDate = time.Now()
+	return rm
+}
+
+func (r roomRepository) mapDomainToModelUpdate(updt domain.Room) map[string]interface{} {
+	result := make(map[string]interface{},1)
+	if updt.Name != "" {
+		result["name"] = updt.Name
+	}
+	if updt.Description != nil {
+		result["description"] = updt.Description
+	}
+	result["updated_date"] = time.Now()
+	return result
 }
 
 func (r roomRepository) mapModelToDomainCollection(rooms []room) []domain.Room {

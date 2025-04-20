@@ -149,6 +149,14 @@ func RoomRouter(r chi.Router, rc controllers.RoomController, hs app.HouseService
 			"/{roomId}",
 			rc.Find(),
 		)
+		apiRouter.With(rpom).Put(
+			"/{roomId}",
+			rc.Update(),
+		)
+		apiRouter.With(rpom).Delete(
+			"/{roomId}",
+			rc.Delete(),
+		)
 
 	})
 }

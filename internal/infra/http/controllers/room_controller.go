@@ -68,3 +68,42 @@ func (c RoomController) Find() http.HandlerFunc {
 		Success(w, roomDto)
 	}
 }
+
+func (c RoomController) Update() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		updt, err := requests.Bind(r, requests.UpdateRoomRequest{}, domain.Room{})
+		if err != nil {
+			log.Printf("RoomController.Update(requests.BindToMap): %s", err)
+			BadRequest(w, errors.New("invalid request body"))
+			return
+		}
+
+		room := r.Context().Value(RoomKey).(domain.Room)
+
+		room, err = c.roomService.Update(updt, room)
+		if err != nil {
+			log.Printf("RoomController.Update(c.roomService.Update): %s", err)
+			InternalServerError(w, err)
+			return
+		}
+
+		var roomDto resources.RoomDto
+		roomDto = roomDto.DomainToDto(room)
+		Success(w, roomDto)
+	}
+}
+
+func (c RoomController) Delete() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		room := r.Context().Value(RoomKey).(domain.Room)
+
+		err := c.roomService.Delete(room.Id)
+		if err != nil {
+			log.Printf("RoomController.Delete(c.roomService.Delete): %s", err)
+			InternalServerError(w, err)
+			return
+		}
+
+		Success(w, resources.Message{Response: "Room was deleted"})
+	}
+}

@@ -11,6 +11,8 @@ type RoomService interface {
 	Save(rm domain.Room) (domain.Room, error)
 	FindList(hId uint64) ([]domain.Room, error)
 	Find(id uint64) (interface{}, error)
+	Update(updt domain.Room,rm domain.Room) (domain.Room, error)
+	Delete(rId uint64) (error)
 }
 
 type roomService struct {
@@ -24,13 +26,13 @@ func NewRoomService(rr database.RoomRepository) RoomService {
 }
 
 func (s roomService) Save(rm domain.Room) (domain.Room, error) {
-	house, err := s.roomRepo.Save(rm)
+	room, err := s.roomRepo.Save(rm)
 	if err != nil {
 		log.Printf("roomService.Save(s.roomRepo.Save): %s", err)
 		return domain.Room{}, err
 	}
 
-	return house, nil
+	return room, nil
 }
 
 func (s roomService) FindList(hId uint64) ([]domain.Room, error) {
@@ -43,22 +45,33 @@ func (s roomService) FindList(hId uint64) ([]domain.Room, error) {
 	return rooms, nil
 }
 
-// func (s roomService) Find(Id uint64) (domain.Room, error) {
-// 	room, err := s.roomRepo.Find(Id)
-// 	if err != nil {
-// 		log.Printf("roomService.Find(s.roomRepo.Find): %s", err)
-// 		return domain.Room{}, err
-// 	}
-
-// 	return room, nil
-// }
 
 func (s roomService) Find(id uint64) (interface{}, error) {
-	house, err := s.roomRepo.Find(id)
+	room, err := s.roomRepo.Find(id)
 	if err != nil {
 		log.Printf("roomService.Find(s.roomRepo.Find): %s", err)
 		return domain.House{}, err
 	}
 
-	return house, nil
+	return room, nil
+}
+
+func (s roomService) Update(updt domain.Room,rm domain.Room) (domain.Room, error) {
+	room, err := s.roomRepo.Update(updt,rm)
+	if err != nil {
+		log.Printf("roomService.Update(s.roomRepo.Update): %s", err)
+		return domain.Room{}, err
+	}
+
+	return room, nil
+}
+
+func (s roomService) Delete(rId uint64) (error) {
+	err := s.roomRepo.Delete(rId)
+	if err != nil {
+		log.Printf("roomService.Delete(s.roomRepo.Delete): %s", err)
+		return err
+	}
+
+	return nil
 }
