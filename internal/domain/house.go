@@ -1,6 +1,8 @@
 package domain
 
-import "time"
+import (
+	"time"
+)
 
 type House struct {
 	Id          uint64
@@ -11,9 +13,8 @@ type House struct {
 	Address     string
 	Lat         float64
 	Lon         float64
+	Rooms       []Room
 	CreatedDate time.Time
 	UpdatedDate time.Time
 	DeletedDate *time.Time
 }
-
-

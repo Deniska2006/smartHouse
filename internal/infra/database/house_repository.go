@@ -58,12 +58,12 @@ func (r houseRepository) Save(h domain.House) (domain.House, error) {
 }
 
 func (r houseRepository) Update(updt domain.House, h domain.House) (domain.House, error) {
-	err := r.coll.Find(db.Cond{"id": h.Id}).Update(r.mapDomainToModelUpdate(updt))
+	err := r.coll.Find(db.Cond{"id": h.Id}).Update(r.mapDomainToInterfaceUpdate(updt))
 	if err != nil {
 		return domain.House{}, err
 	}
 
-	return r.mapModelToDomainUpdate(updt, h), nil
+	return r.mapInterfaceToDomainUpdate(updt, h), nil
 }
 
 func (r houseRepository) Delete(hId uint64) error {
@@ -121,8 +121,8 @@ func (r houseRepository) mapDomainToModel(d domain.House) house {
 	}
 }
 
-func (r houseRepository) mapDomainToModelUpdate(updt domain.House) map[string]interface{} {
-	result := make(map[string]interface{},1)
+func (r houseRepository) mapDomainToInterfaceUpdate(updt domain.House) map[string]interface{} {
+	result := make(map[string]interface{}, 1)
 	if updt.Name != "" {
 		result["name"] = updt.Name
 	}
@@ -170,7 +170,7 @@ func (r houseRepository) mapModelToDomainCollection(houses []house) []domain.Hou
 	return hs
 }
 
-func (r houseRepository) mapModelToDomainUpdate(updt domain.House, h domain.House) domain.House {
+func (r houseRepository) mapInterfaceToDomainUpdate(updt domain.House, h domain.House) domain.House {
 	if updt.Name != h.Name && updt.Name != "" {
 		h.Name = updt.Name
 	}

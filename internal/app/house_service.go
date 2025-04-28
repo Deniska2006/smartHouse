@@ -13,15 +13,18 @@ type HouseService interface {
 	FindList(uId uint64) ([]domain.House, error)
 	Update(updt domain.House, h domain.House) (domain.House, error)
 	Delete(hId uint64) error
+	FindbyIdRooms(id uint64) ([]domain.Room, error)
 }
 
 type houseService struct {
 	houseRepo database.HouseRepository
+	roomRepo  database.RoomRepository
 }
 
-func NewHouseService(hr database.HouseRepository) HouseService {
+func NewHouseService(hr database.HouseRepository, rr database.RoomRepository) HouseService {
 	return houseService{
 		houseRepo: hr,
+		roomRepo:  rr,
 	}
 }
 
@@ -56,6 +59,7 @@ func (s houseService) Delete(hId uint64) error {
 }
 
 func (s houseService) Find(id uint64) (interface{}, error) {
+
 	house, err := s.houseRepo.Find(id)
 	if err != nil {
 		log.Printf("houseService.Find(s.houseRepo.Find): %s", err)
@@ -65,8 +69,20 @@ func (s houseService) Find(id uint64) (interface{}, error) {
 	return house, nil
 }
 
+func (s houseService) FindbyIdRooms(id uint64) ([]domain.Room, error) {
+	rooms, err := s.roomRepo.FindList(id)
+	if err != nil {
+		log.Printf("houseService.FindbyID(s.houseRepo.FindbyId): %s", err)
+		return nil, err
+	}
+
+	return rooms, nil
+}
+
 func (s houseService) FindList(uId uint64) ([]domain.House, error) {
+
 	house, err := s.houseRepo.FindList(uId)
+
 	if err != nil {
 		log.Printf("houseService.FindList(s.houseRepo.FindList) :%s", err)
 		return nil, err

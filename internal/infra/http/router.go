@@ -145,7 +145,7 @@ func RoomRouter(r chi.Router, rc controllers.RoomController, hs app.HouseService
 			"/",
 			rc.FindList(),
 		)
-		apiRouter.With(hpom, rpom).Get(
+		apiRouter.With(rpom).Get(
 			"/{roomId}",
 			rc.Find(),
 		)
