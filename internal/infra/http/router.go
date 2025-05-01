@@ -113,19 +113,19 @@ func HouseRouter(r chi.Router, hc controllers.HouseController, hs app.HouseServi
 			"/",
 			hc.Save(),
 		)
-		apiRouter.With(hpom).Get(
+		apiRouter.With(hpom,middlewares.IsOwner()).Get( // middlewares.IsOwner()
 			"/{houseId}",
 			hc.Find(),
 		)
-		apiRouter.Get(
+		apiRouter.With().Get(
 			"/",
 			hc.FindList(),
 		)
-		apiRouter.With(hpom).Put(
+		apiRouter.With(hpom,middlewares.IsOwner()).Put(
 			"/{houseId}",
 			hc.Update(),
 		)
-		apiRouter.With(hpom).Delete(
+		apiRouter.With(hpom,middlewares.IsOwner()).Delete(
 			"/{houseId}",
 			hc.Delete(),
 		)
