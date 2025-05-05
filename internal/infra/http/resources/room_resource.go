@@ -8,7 +8,7 @@ import (
 
 type RoomDto struct {
 	Id          uint64     `json:"id"`
-	HouseId     uint64     `json:"house_Id"`
+	HouseId     uint64     `json:"houseId"`
 	Name        string     `json:"name"`
 	Description *string    `json:"description,omitempty"`
 	CreatedDate time.Time  `json:"createdDate"`

@@ -54,6 +54,7 @@ func Router(cont container.Container) http.Handler {
 				UserRouter(apiRouter, cont.UserController)
 				HouseRouter(apiRouter, cont.HouseController, cont.HouseService)
 				RoomRouter(apiRouter, cont.RoomController, cont.HouseService, cont.RoomService)
+				DeviceRouter(apiRouter, cont.DeviceController, cont.HouseService, cont.RoomService)
 
 				apiRouter.Handle("/*", NotFoundJSON())
 			})
@@ -113,7 +114,7 @@ func HouseRouter(r chi.Router, hc controllers.HouseController, hs app.HouseServi
 			"/",
 			hc.Save(),
 		)
-		apiRouter.With(hpom,middlewares.IsOwner()).Get( // middlewares.IsOwner()
+		apiRouter.With(hpom, middlewares.IsOwner()).Get( // middlewares.IsOwner()
 			"/{houseId}",
 			hc.Find(),
 		)
@@ -121,11 +122,11 @@ func HouseRouter(r chi.Router, hc controllers.HouseController, hs app.HouseServi
 			"/",
 			hc.FindList(),
 		)
-		apiRouter.With(hpom,middlewares.IsOwner()).Put(
+		apiRouter.With(hpom, middlewares.IsOwner()).Put(
 			"/{houseId}",
 			hc.Update(),
 		)
-		apiRouter.With(hpom,middlewares.IsOwner()).Delete(
+		apiRouter.With(hpom, middlewares.IsOwner()).Delete(
 			"/{houseId}",
 			hc.Delete(),
 		)
@@ -158,6 +159,18 @@ func RoomRouter(r chi.Router, rc controllers.RoomController, hs app.HouseService
 			rc.Delete(),
 		)
 
+	})
+}
+
+func DeviceRouter(r chi.Router, dc controllers.DeviceController, hs app.HouseService, rs app.RoomService) {
+	hpom := middlewares.PathObject("houseId", controllers.HouseKey, hs)
+	rpom := middlewares.PathObject("roomId", controllers.RoomKey, rs)
+
+	r.Route("/houses/{houseId}/rooms/{roomId}", func(apiRouter chi.Router) {
+		apiRouter.With(hpom, rpom).Post(
+			"/",
+			dc.Save(),
+		)
 	})
 }
 

@@ -32,10 +32,11 @@ type Services struct {
 }
 
 type Controllers struct {
-	AuthController  controllers.AuthController
-	UserController  controllers.UserController
-	HouseController controllers.HouseController
-	RoomController  controllers.RoomController
+	AuthController   controllers.AuthController
+	UserController   controllers.UserController
+	HouseController  controllers.HouseController
+	RoomController   controllers.RoomController
+	DeviceController controllers.DeviceController
 }
 
 func New(conf config.Configuration) Container {
@@ -46,16 +47,19 @@ func New(conf config.Configuration) Container {
 	userRepository := database.NewUserRepository(sess)
 	houseRepository := database.NewHouseRepository(sess)
 	roomRepository := database.NewRoomRepository(sess)
+	deviceRepository := database.NewDeviceRepository(sess)
 
 	userService := app.NewUserService(userRepository)
 	authService := app.NewAuthService(sessionRepository, userRepository, tknAuth, conf.JwtTTL)
 	houseService := app.NewHouseService(houseRepository, roomRepository)
 	roomService := app.NewRoomService(roomRepository)
+	deviceService := app.NewDeviceService(deviceRepository)
 
 	authController := controllers.NewAuthController(authService, userService)
 	userController := controllers.NewUserController(userService, authService)
 	houseController := controllers.NewHouseController(houseService)
 	roomController := controllers.NewRoomController(roomService)
+	deviceController := controllers.NewDeviceController(deviceService)
 
 	authMiddleware := middlewares.AuthMiddleware(tknAuth, authService, userService)
 
@@ -74,6 +78,7 @@ func New(conf config.Configuration) Container {
 			userController,
 			houseController,
 			roomController,
+			deviceController,
 		},
 	}
 }
