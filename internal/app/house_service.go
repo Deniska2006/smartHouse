@@ -80,22 +80,12 @@ func (s houseService) FindbyIdRooms(id uint64) ([]domain.Room, error) {
 }
 
 func (s houseService) FindList(uId uint64) ([]domain.House, error) {
-	var rooms []domain.Room
+
 	houses, err := s.houseRepo.FindList(uId)
 
 	if err != nil {
 		log.Printf("houseService.FindList(s.houseRepo.FindList) :%s", err)
 		return nil, err
 	}
-
-	for i, h := range houses {
-		rooms, err = s.roomRepo.FindList(h.Id)
-		if err != nil {
-			log.Printf("houseService.FindList(s.roomRepo.FindList: %s", err)
-			return nil, err
-		}
-		houses[i].Rooms = rooms
-	}
-
 	return houses, nil
 }
