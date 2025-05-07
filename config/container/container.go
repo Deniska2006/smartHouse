@@ -29,6 +29,7 @@ type Services struct {
 	app.UserService
 	app.HouseService
 	app.RoomService
+	app.DeviceService
 }
 
 type Controllers struct {
@@ -72,6 +73,7 @@ func New(conf config.Configuration) Container {
 			userService,
 			houseService,
 			roomService,
+			deviceService,
 		},
 		Controllers: Controllers{
 			authController,

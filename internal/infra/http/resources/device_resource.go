@@ -38,3 +38,11 @@ func (d DeviceDto) DomainToDto(r domain.Device) DeviceDto {
 		DeletedDate:      r.DeletedDate,
 	}
 }
+
+func (d DeviceDto) DomainToDtoCollection(devices []domain.Device) []DeviceDto {
+	dvcs := make([]DeviceDto, len(devices))
+	for i, dev := range devices {
+		dvcs[i] = d.DomainToDto(dev)
+	}
+	return dvcs
+}

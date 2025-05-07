@@ -41,11 +41,8 @@ func (c DeviceController) Save() http.HandlerFunc {
 			return
 		}
 
-		houseId := r.Context().Value(HouseKey).(domain.House).Id
-		roomId := r.Context().Value(RoomKey).(domain.Room).Id
-
-		device.HouseId = houseId
-		device.RoomId = roomId
+		device.HouseId = r.Context().Value(HouseKey).(domain.House).Id
+		device.RoomId = r.Context().Value(RoomKey).(domain.Room).Id
 		device.UUID = uuid.New()
 
 		device, err = c.deviceService.Save(device)
@@ -58,5 +55,25 @@ func (c DeviceController) Save() http.HandlerFunc {
 		var deviceDto resources.DeviceDto
 		deviceDto = deviceDto.DomainToDto(device)
 		Success(w, deviceDto)
+	}
+}
+
+func (c DeviceController) FindList() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		devices, err := c.deviceService.FindList(r.Context().Value(RoomKey).(domain.Room).Id)
+		if err != nil {
+			log.Printf("DeviceController.Save(c.deviceService.Save): %s", err)
+			InternalServerError(w, err)
+			return
+		}
+
+		Success(w, resources.DeviceDto{}.DomainToDtoCollection(devices))
+	}
+}
+
+func (c DeviceController) Find() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		Success(w, resources.DeviceDto{}.DomainToDto(r.Context().Value(DeviceKey).(domain.Device)))
 	}
 }

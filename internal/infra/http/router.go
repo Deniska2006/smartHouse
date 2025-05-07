@@ -54,7 +54,7 @@ func Router(cont container.Container) http.Handler {
 				UserRouter(apiRouter, cont.UserController)
 				HouseRouter(apiRouter, cont.HouseController, cont.HouseService)
 				RoomRouter(apiRouter, cont.RoomController, cont.HouseService, cont.RoomService)
-				DeviceRouter(apiRouter, cont.DeviceController, cont.HouseService, cont.RoomService)
+				DeviceRouter(apiRouter, cont.DeviceController, cont.HouseService, cont.RoomService, cont.DeviceService)
 
 				apiRouter.Handle("/*", NotFoundJSON())
 			})
@@ -142,19 +142,19 @@ func RoomRouter(r chi.Router, rc controllers.RoomController, hs app.HouseService
 			"/",
 			rc.Save(),
 		)
-		apiRouter.With(hpom).Get(
+		apiRouter.With(hpom, middlewares.IsOwner()).Get(
 			"/",
 			rc.FindList(),
 		)
-		apiRouter.With(rpom).Get(
+		apiRouter.With(hpom, rpom, middlewares.IsOwner()).Get(
 			"/{roomId}",
 			rc.Find(),
 		)
-		apiRouter.With(rpom).Put(
+		apiRouter.With(hpom, rpom, middlewares.IsOwner(), rpom).Put(
 			"/{roomId}",
 			rc.Update(),
 		)
-		apiRouter.With(rpom).Delete(
+		apiRouter.With(hpom, rpom, middlewares.IsOwner()).Delete(
 			"/{roomId}",
 			rc.Delete(),
 		)
@@ -162,16 +162,26 @@ func RoomRouter(r chi.Router, rc controllers.RoomController, hs app.HouseService
 	})
 }
 
-func DeviceRouter(r chi.Router, dc controllers.DeviceController, hs app.HouseService, rs app.RoomService) {
+func DeviceRouter(r chi.Router, dc controllers.DeviceController, hs app.HouseService, rs app.RoomService, ds app.DeviceService) {
 	hpom := middlewares.PathObject("houseId", controllers.HouseKey, hs)
 	rpom := middlewares.PathObject("roomId", controllers.RoomKey, rs)
+	dpom := middlewares.PathObject("deviceId", controllers.DeviceKey, ds)
 
-	r.Route("/houses/{houseId}/rooms/{roomId}", func(apiRouter chi.Router) {
+	r.Route("/houses/{houseId}/rooms/{roomId}/devices", func(apiRouter chi.Router) {
 		apiRouter.With(hpom, rpom).Post(
 			"/",
 			dc.Save(),
 		)
+		apiRouter.With(hpom,rpom, middlewares.IsOwner()).Get(
+			"/",
+			dc.FindList(),
+		)
+		apiRouter.With(hpom,rpom,dpom, middlewares.IsOwner()).Get(
+			"/{deviceId}",
+			dc.Find(),
+		)
 	})
+
 }
 
 func NotFoundJSON() http.HandlerFunc {
