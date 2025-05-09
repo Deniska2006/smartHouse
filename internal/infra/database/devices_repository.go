@@ -29,6 +29,7 @@ type DeviceRepository interface {
 	Save(d domain.Device) (domain.Device, error)
 	FindList(rId uint64) ([]domain.Device, error)
 	Find(id uint64) (domain.Device, error)
+	Update(updt domain.Device, d domain.Device) (domain.Device, error)
 }
 
 type deviceRepository struct {
@@ -82,6 +83,15 @@ func (r deviceRepository) Find(id uint64) (domain.Device, error) {
 	return r.mapModelToDomain(d), nil
 }
 
+func (r deviceRepository) Update(updt domain.Device, d domain.Device) (domain.Device, error) {
+	err := r.coll.Find(db.Cond{"id": d.Id}).Update(r.mapDomainToInterfaceUpdate(updt, d))
+	if err != nil {
+		return domain.Device{}, err
+	}
+
+	return r.mapUpdateToDomain(updt, d), nil
+}
+
 func (r deviceRepository) mapDomainToModel(d domain.Device) device {
 	return device{
 		Id:               d.Id,
@@ -120,4 +130,69 @@ func (r deviceRepository) mapModelToDomainCollection(devices []device) []domain.
 	}
 
 	return dvcs
+}
+
+func (r deviceRepository) mapDomainToInterfaceUpdate(updt, d domain.Device) map[string]interface{} {
+	result := make(map[string]interface{})
+
+	if updt.SerialNumber != "" {
+		result["serial_number"] = updt.SerialNumber
+	}
+	if updt.Characteristics != nil {
+		result["characteristics"] = updt.Characteristics
+	}
+	if updt.Category != "" {
+		result["category"] = updt.Category
+	}
+
+	finalCategory := d.Category
+	if updt.Category != "" {
+		finalCategory = updt.Category
+	}
+
+	if finalCategory == domain.SENSOR {
+		result["power_consumption"] = nil
+		if updt.Units != nil {
+			result["units"] = updt.Units
+		}
+	}
+	if finalCategory == domain.ACTUATOR {
+		result["units"] = nil
+		if updt.PowerConsumption != nil {
+			result["power_consumption"] = updt.PowerConsumption
+		}
+	}
+
+	result["updated_date"] = time.Now()
+	return result
+}
+
+
+
+
+func (r deviceRepository) mapUpdateToDomain(updt domain.Device, d domain.Device) domain.Device {
+	if updt.SerialNumber != "" {
+		d.SerialNumber = updt.SerialNumber
+	}
+	if updt.Characteristics != nil {
+		d.Characteristics = updt.Characteristics
+	}
+	if updt.Category != "" {
+		d.Category = updt.Category
+	}
+	if updt.Units != nil {
+		d.Units = updt.Units
+	}
+	if updt.PowerConsumption != nil {
+		d.PowerConsumption = updt.PowerConsumption
+	}
+	if updt.Category == domain.ACTUATOR{
+		d.Units = nil
+	}
+	if updt.Category == domain.SENSOR{
+		d.PowerConsumption = nil
+	}
+	d.UpdatedDate = time.Now()
+	return d
+
 }

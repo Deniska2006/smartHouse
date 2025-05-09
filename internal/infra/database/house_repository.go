@@ -63,7 +63,7 @@ func (r houseRepository) Update(updt domain.House, h domain.House) (domain.House
 		return domain.House{}, err
 	}
 
-	return r.mapInterfaceToDomainUpdate(updt, h), nil
+	return r.mapUpdateToDomain(updt, h), nil
 }
 
 func (r houseRepository) Delete(hId uint64) error {
@@ -170,7 +170,7 @@ func (r houseRepository) mapModelToDomainCollection(houses []house) []domain.Hou
 	return hs
 }
 
-func (r houseRepository) mapInterfaceToDomainUpdate(updt domain.House, h domain.House) domain.House {
+func (r houseRepository) mapUpdateToDomain(updt domain.House, h domain.House) domain.House {
 	if updt.Name != h.Name && updt.Name != "" {
 		h.Name = updt.Name
 	}
