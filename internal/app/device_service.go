@@ -12,6 +12,7 @@ type DeviceService interface {
 	FindList(rId uint64) ([]domain.Device, error)
 	Find(id uint64) (interface{}, error)
 	Update(updt domain.Device,d domain.Device) (domain.Device, error)
+	Delete(dId uint64) (error)
 }
 
 type deviceService struct {
@@ -59,9 +60,20 @@ func (s deviceService) Update(updt domain.Device,d domain.Device) (domain.Device
 
 	device, err := s.deviceRepo.Update(updt,d)
 	if err != nil {
-		log.Printf("deviceService.Find(s.deviceRepo.Find): %s", err)
+		log.Printf("deviceService.Update(s.deviceRepo.Update): %s", err)
 		return domain.Device{}, err
 	}
 
 	return device, nil
+}
+
+func (s deviceService) Delete(dId uint64) (error) {
+
+	err := s.deviceRepo.Delete(dId)
+	if err != nil {
+		log.Printf("deviceService.Delete(s.deviceRepo.Delete): %s", err)
+		return err
+	}
+
+	return  nil
 }

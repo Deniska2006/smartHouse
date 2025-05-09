@@ -85,15 +85,15 @@ func (c DeviceController) Update() http.HandlerFunc {
 			return
 		}
 
-		device :=  r.Context().Value(DeviceKey).(domain.Device)
+		device := r.Context().Value(DeviceKey).(domain.Device)
 
-		if !Valid(updt,device) {
+		if !UpdateValid(updt, device) {
 			err = errors.New("Wrong data request")
 			Forbidden(w, err)
 			return
 		}
 
-		device, err = c.deviceService.Update(updt,device)
+		device, err = c.deviceService.Update(updt, device)
 		if err != nil {
 			log.Printf("DeviceController.Update(c.deviceService.Update): %s", err)
 			InternalServerError(w, err)
@@ -104,31 +104,43 @@ func (c DeviceController) Update() http.HandlerFunc {
 	}
 }
 
-func Valid(updt, device domain.Device) bool {
-	if (updt.Units != nil && updt.PowerConsumption != nil){ // те і те
-		return false 
+func (c DeviceController) Delete() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		err := c.deviceService.Delete(r.Context().Value(DeviceKey).(domain.Device).Id)
+		if err != nil {
+			log.Printf("DeviceController.Delete(c.deviceService.Delete): %s", err)
+			InternalServerError(w, err)
+			return
+		}
+		Success(w, resources.Message{Response: "Device was deleted"})
 	}
-	if (updt.Category == domain.ACTUATOR && updt.Units != nil){ // для актуатора тільки повер
-		return false
-	} 
-	if (updt.Category == domain.SENSOR && updt.PowerConsumption != nil){ // для сенсора тільки юнітс
-		return false
-	}
-	if (updt.Category == ""&& device.Category == domain.ACTUATOR && updt.Units != nil){ // не оновлюємо категорію але намагаємося в актуатор засунути юнітся
-		return false
-	}
-	if (updt.Category == ""&& device.Category == domain.SENSOR && updt.PowerConsumption != nil){ // не оновлюємо категорію але намагаємося в сенсор засунути повер
-		return false
-	}
-	if (updt.Category == domain.ACTUATOR && device.Units != nil&& updt.PowerConsumption == nil){// намагаємося змінити категорію не змінивши тип
-		return false
-	}
-	if ( updt.Category == domain.SENSOR && device.PowerConsumption != nil && updt.Units == nil ){// намагаємося змінити категорію не змінивши тип
-		return false
-	}
-	if (updt.Category != ""&& updt.Units == nil && updt.PowerConsumption == nil){ // якщо змінюємо категорію але не вказуємо нічого
-		return false
-	}
-	return  true
 }
 
+func UpdateValid(updt, device domain.Device) bool {
+	if updt.Units != nil && updt.PowerConsumption != nil { // те і те
+		return false
+	}
+	if updt.Category == domain.ACTUATOR && updt.Units != nil { // для актуатора тільки повер
+		return false
+	}
+	if updt.Category == domain.SENSOR && updt.PowerConsumption != nil { // для сенсора тільки юнітс
+		return false
+	}
+	if updt.Category == "" && device.Category == domain.ACTUATOR && updt.Units != nil { // не оновлюємо категорію але намагаємося в актуатор засунути юнітся
+		return false
+	}
+	if updt.Category == "" && device.Category == domain.SENSOR && updt.PowerConsumption != nil { // не оновлюємо категорію але намагаємося в сенсор засунути повер
+		return false
+	}
+	if updt.Category == domain.ACTUATOR && device.Units != nil && updt.PowerConsumption == nil { // намагаємося змінити категорію не змінивши тип
+		return false
+	}
+	if updt.Category == domain.SENSOR && device.PowerConsumption != nil && updt.Units == nil { // намагаємося змінити категорію не змінивши тип
+		return false
+	}
+	if updt.Category != "" && updt.Units == nil && updt.PowerConsumption == nil { // якщо змінюємо категорію але не вказуємо нічого
+		return false
+	}
+	return true
+}

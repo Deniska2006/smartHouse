@@ -30,6 +30,7 @@ type DeviceRepository interface {
 	FindList(rId uint64) ([]domain.Device, error)
 	Find(id uint64) (domain.Device, error)
 	Update(updt domain.Device, d domain.Device) (domain.Device, error)
+	Delete(dId uint64) error
 }
 
 type deviceRepository struct {
@@ -90,6 +91,17 @@ func (r deviceRepository) Update(updt domain.Device, d domain.Device) (domain.De
 	}
 
 	return r.mapUpdateToDomain(updt, d), nil
+}
+
+func (r deviceRepository) Delete(dId uint64) error {
+	err := r.coll.Find(db.Cond{"id": dId}).Update(map[string]interface{}{
+		"deleted_date": time.Now(),
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r deviceRepository) mapDomainToModel(d domain.Device) device {
