@@ -91,9 +91,9 @@ func (c HouseController) Find() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		house := r.Context().Value(HouseKey).(domain.House)
 
-		rooms, err := c.houseService.FindbyIdRooms(house.Id)
+		rooms, err := c.houseService.FindRooms(house.Id)
 		if err != nil {
-			log.Printf("Error,c HouseController.Find().FindbyIdRooms(): %s", err)
+			log.Printf("Error,c.HouseController.Find().FindRooms(): %s", err)
 			return
 		}
 

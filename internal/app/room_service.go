@@ -11,17 +11,20 @@ type RoomService interface {
 	Save(rm domain.Room) (domain.Room, error)
 	FindList(hId uint64) ([]domain.Room, error)
 	Find(id uint64) (interface{}, error)
-	Update(updt domain.Room,rm domain.Room) (domain.Room, error)
-	Delete(rId uint64) (error)
+	Update(updt domain.Room, rm domain.Room) (domain.Room, error)
+	Delete(rId uint64) error
+	FindDevices(rid uint64) ([]domain.Device, error)
 }
 
 type roomService struct {
-	roomRepo database.RoomRepository
+	roomRepo   database.RoomRepository
+	deviceRepo database.DeviceRepository
 }
 
-func NewRoomService(rr database.RoomRepository) RoomService {
+func NewRoomService(rr database.RoomRepository, dr database.DeviceRepository) RoomService {
 	return roomService{
-		roomRepo: rr,
+		roomRepo:   rr,
+		deviceRepo: dr,
 	}
 }
 
@@ -45,7 +48,6 @@ func (s roomService) FindList(hId uint64) ([]domain.Room, error) {
 	return rooms, nil
 }
 
-
 func (s roomService) Find(id uint64) (interface{}, error) {
 	room, err := s.roomRepo.Find(id)
 	if err != nil {
@@ -56,8 +58,18 @@ func (s roomService) Find(id uint64) (interface{}, error) {
 	return room, nil
 }
 
-func (s roomService) Update(updt domain.Room,rm domain.Room) (domain.Room, error) {
-	room, err := s.roomRepo.Update(updt,rm)
+func (s roomService) FindDevices(rid uint64) ([]domain.Device, error) {
+	devices, err := s.deviceRepo.FindList(rid)
+	if err != nil {
+		log.Printf("roomService.FindDevices(s.deviceRepo.FindList): %s", err)
+		return nil, err
+	}
+
+	return devices, nil
+}
+
+func (s roomService) Update(updt domain.Room, rm domain.Room) (domain.Room, error) {
+	room, err := s.roomRepo.Update(updt, rm)
 	if err != nil {
 		log.Printf("roomService.Update(s.roomRepo.Update): %s", err)
 		return domain.Room{}, err
@@ -66,7 +78,7 @@ func (s roomService) Update(updt domain.Room,rm domain.Room) (domain.Room, error
 	return room, nil
 }
 
-func (s roomService) Delete(rId uint64) (error) {
+func (s roomService) Delete(rId uint64) error {
 	err := s.roomRepo.Delete(rId)
 	if err != nil {
 		log.Printf("roomService.Delete(s.roomRepo.Delete): %s", err)

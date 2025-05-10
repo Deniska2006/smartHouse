@@ -101,8 +101,7 @@ func (r houseRepository) Find(id uint64) (domain.House, error) {
 		return domain.House{}, err
 	}
 
-	hs := r.mapModelToDomain(h)
-	return hs, nil
+	return r.mapModelToDomain(h), nil
 }
 
 func (r houseRepository) mapDomainToModel(d domain.House) house {

@@ -7,6 +7,7 @@ type Room struct {
 	HouseId     uint64
 	Name        string
 	Description *string
+	Devices		[]Device		
 	CreatedDate time.Time
 	UpdatedDate time.Time
 	DeletedDate *time.Time
