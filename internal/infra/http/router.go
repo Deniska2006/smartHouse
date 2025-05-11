@@ -6,9 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 
-	"github.com/BohdanBoriak/boilerplate-go-back/config"
 	"github.com/BohdanBoriak/boilerplate-go-back/config/container"
 	"github.com/BohdanBoriak/boilerplate-go-back/internal/app"
 	"github.com/BohdanBoriak/boilerplate-go-back/internal/infra/http/controllers"
@@ -20,9 +18,9 @@ import (
 )
 
 func Router(cont container.Container) http.Handler {
-
 	router := chi.NewRouter()
 
+	// Middleware
 	router.Use(middleware.RedirectSlashes, middleware.Logger, cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*", "capacitor://localhost"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -32,22 +30,22 @@ func Router(cont container.Container) http.Handler {
 		MaxAge:           300,
 	}))
 
+	// API
 	router.Route("/api", func(apiRouter chi.Router) {
-		// Health
 		apiRouter.Route("/ping", func(healthRouter chi.Router) {
 			healthRouter.Get("/", PingHandler())
 			healthRouter.Handle("/*", NotFoundJSON())
 		})
 
 		apiRouter.Route("/v1", func(apiRouter chi.Router) {
-			// Public routes
+			// Public
 			apiRouter.Group(func(apiRouter chi.Router) {
 				apiRouter.Route("/auth", func(apiRouter chi.Router) {
 					AuthRouter(apiRouter, cont.AuthController, cont.AuthMw)
 				})
 			})
 
-			// Protected routes
+			// Protected
 			apiRouter.Group(func(apiRouter chi.Router) {
 				apiRouter.Use(cont.AuthMw)
 
@@ -61,13 +59,14 @@ func Router(cont container.Container) http.Handler {
 		})
 	})
 
-	router.Get("/static/*", func(w http.ResponseWriter, r *http.Request) {
+	// Статичні файли (CSS, JS, тощо): доступ через /ui/*
+	router.Handle("/ui/*", http.StripPrefix("/ui/", http.FileServer(http.Dir("ui"))))
+
+	// HTML сторінка авторизації: /auth/login
+	router.Get("/auth/login", func(w http.ResponseWriter, r *http.Request) {
 		workDir, _ := os.Getwd()
-		filesDir := http.Dir(filepath.Join(workDir, config.GetConfiguration().FileStorageLocation))
-		rctx := chi.RouteContext(r.Context())
-		pathPrefix := strings.TrimSuffix(rctx.RoutePattern(), "/*")
-		fs := http.StripPrefix(pathPrefix, http.FileServer(filesDir))
-		fs.ServeHTTP(w, r)
+		loginPage := filepath.Join(workDir, "ui", "site.html")
+		http.ServeFile(w, r, loginPage)
 	})
 
 	return router

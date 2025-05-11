@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <title>SmartHome - Вхід / Реєстрація</title>
+    <link href="/ui/site.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>SmartHouse</h1>
+
+      <div class="form-container" id="auth-forms"  method="POST">
+        <!-- Форма входу -->
+        <form id="login-form" class="active">
+          <h2>Вхід</h2>
+          <input type="email" id="login-email" placeholder="Email" required />
+          <input type="password" id="login-password" placeholder="Пароль" required />
+          <button type="submit">Увійти</button>
+          <p>Немає акаунту? <a href="#" id="show-register">Зареєструватися</a></p>
+        </form>
+
+        <!-- Форма реєстрації -->
+        <form id="register-form"  method="POST">
+          <h2>Реєстрація</h2>
+          <input type="text" id="register-first-name" placeholder="Ім’я" required />
+          <input type="text" id="register-second-name" placeholder="Прізвище" required />
+          <input type="email" id="register-email" placeholder="Email" required />
+          <input type="password" id="register-password" placeholder="Пароль" required />
+          <button type="submit">Зареєструватися</button>
+          <p>Вже є акаунт? <a href="#" id="show-login">Увійти</a></p>
+        </form>
+      </div>
+    </div>
+
+    <script src="/ui/logic.js" defer></script>
+  </body>
+</html>
