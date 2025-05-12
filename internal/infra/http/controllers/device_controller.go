@@ -66,7 +66,7 @@ func (c DeviceController) FindList() http.HandlerFunc {
 			return
 		}
 
-		Success(w, resources.DeviceDto{}.DomainToDtoCollection(devices))
+		Success(w, resources.DeviceDtoForList{}.DomainToDtoCollection(devices))
 	}
 }
 

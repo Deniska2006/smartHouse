@@ -53,6 +53,7 @@ func Router(cont container.Container) http.Handler {
 				HouseRouter(apiRouter, cont.HouseController, cont.HouseService)
 				RoomRouter(apiRouter, cont.RoomController, cont.HouseService, cont.RoomService)
 				DeviceRouter(apiRouter, cont.DeviceController, cont.HouseService, cont.RoomService, cont.DeviceService)
+				MeasurementRouter(apiRouter, cont.MeasurementConmtroller)
 
 				apiRouter.Handle("/*", NotFoundJSON())
 			})
@@ -189,6 +190,15 @@ func DeviceRouter(r chi.Router, dc controllers.DeviceController, hs app.HouseSer
 		)
 	})
 
+}
+
+func MeasurementRouter(r chi.Router, mc controllers.MeasurementController) {
+	r.Route("/measurements", func(apiRouter chi.Router) {
+		apiRouter.Post(
+			"/",
+			mc.Save(),
+		)
+	})
 }
 
 func NotFoundJSON() http.HandlerFunc {

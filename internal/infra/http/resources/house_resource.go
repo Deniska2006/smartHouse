@@ -21,6 +21,13 @@ type HouseDto struct {
 	DeletedDate *time.Time `json:"deletedDate,omitempty"`
 }
 
+type HouseDtoForList struct {
+	Name        string  `json:"name"`
+	Description *string `json:"description,omitempty"`
+	City        string  `json:"city"`
+	Address     string  `json:"address"`
+}
+
 type Message struct {
 	Response string
 }
@@ -42,10 +49,27 @@ func (d HouseDto) DomainToDto(h domain.House) HouseDto {
 	}
 }
 
+func (d HouseDtoForList) DomainToDtoForList(h domain.House) HouseDtoForList {
+	return HouseDtoForList{
+		Name:        h.Name,
+		Description: h.Description,
+		City:        h.City,
+		Address:     h.Address,
+	}
+}
+
 func (d HouseDto) DomainToDtoCollection(houses []domain.House) []HouseDto {
 	hs := make([]HouseDto, len(houses))
 	for i, house := range houses {
 		hs[i] = d.DomainToDto(house)
+	}
+	return hs
+}
+
+func (d HouseDtoForList) DomainToDtoCollectionForList(houses []domain.House) []HouseDtoForList {
+	hs := make([]HouseDtoForList, len(houses))
+	for i, house := range houses {
+		hs[i] = d.DomainToDtoForList(house)
 	}
 	return hs
 }

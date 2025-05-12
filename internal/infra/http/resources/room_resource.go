@@ -17,6 +17,11 @@ type RoomDto struct {
 	DeletedDate *time.Time  `json:"deletedDate,omitempty"`
 }
 
+type RoomDtoForList struct {
+	Name        string  `json:"name"`
+	Description *string `json:"description,omitempty"`
+}
+
 func (d RoomDto) DomainToDto(r domain.Room) RoomDto {
 	return RoomDto{
 		Id:          r.Id,
@@ -30,8 +35,23 @@ func (d RoomDto) DomainToDto(r domain.Room) RoomDto {
 	}
 }
 
+func (d RoomDtoForList) DomainToDto(r domain.Room) RoomDtoForList {
+	return RoomDtoForList{
+		Name:        r.Name,
+		Description: r.Description,
+	}
+}
+
 func (d RoomDto) DomainToDtoCollection(rooms []domain.Room) []RoomDto {
 	rs := make([]RoomDto, len(rooms))
+	for i, room := range rooms {
+		rs[i] = d.DomainToDto(room)
+	}
+	return rs
+}
+
+func (d RoomDtoForList) DomainToDtoCollection(rooms []domain.Room) []RoomDtoForList {
+	rs := make([]RoomDtoForList, len(rooms))
 	for i, room := range rooms {
 		rs[i] = d.DomainToDto(room)
 	}

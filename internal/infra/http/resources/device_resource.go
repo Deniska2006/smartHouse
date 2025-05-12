@@ -22,6 +22,14 @@ type DeviceDto struct {
 	DeletedDate      *time.Time `json:"deletedDate,omitempty"`
 }
 
+type DeviceDtoForList struct {
+	SerialNumber     string     `json:"serialNumber"`
+	Characteristics  *string    `json:"characteristics,omitempty"`
+	Category         string     `json:"category"`
+	Units            *string    `json:"units,omitempty"`
+	PowerConsumption *string    `json:"power_consumption,omitempty"`
+}
+
 func (d DeviceDto) DomainToDto(r domain.Device) DeviceDto {
 	return DeviceDto{
 		Id:               r.Id,
@@ -39,8 +47,26 @@ func (d DeviceDto) DomainToDto(r domain.Device) DeviceDto {
 	}
 }
 
+func (d DeviceDtoForList) DomainToDto(r domain.Device) DeviceDtoForList {
+	return DeviceDtoForList{
+		SerialNumber:     r.SerialNumber,
+		Characteristics:  r.Characteristics,
+		Category:         r.Category,
+		Units:            r.Units,
+		PowerConsumption: r.PowerConsumption,
+	}
+}
+
 func (d DeviceDto) DomainToDtoCollection(devices []domain.Device) []DeviceDto {
 	dvcs := make([]DeviceDto, len(devices))
+	for i, dev := range devices {
+		dvcs[i] = d.DomainToDto(dev)
+	}
+	return dvcs
+}
+
+func (d DeviceDtoForList) DomainToDtoCollection(devices []domain.Device) []DeviceDtoForList {
+	dvcs := make([]DeviceDtoForList, len(devices))
 	for i, dev := range devices {
 		dvcs[i] = d.DomainToDto(dev)
 	}

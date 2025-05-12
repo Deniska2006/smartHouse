@@ -31,6 +31,7 @@ type DeviceRepository interface {
 	Find(id uint64) (domain.Device, error)
 	Update(updt domain.Device, d domain.Device) (domain.Device, error)
 	Delete(dId uint64) error
+	FindDeviceByUUID(u uuid.UUID) error
 }
 
 type deviceRepository struct {
@@ -101,6 +102,18 @@ func (r deviceRepository) Delete(dId uint64) error {
 		return err
 	}
 
+	return nil
+}
+
+func (r deviceRepository) FindDeviceByUUID(u uuid.UUID) error {
+	var d domain.Device
+	err := r.coll.Find(db.Cond{"uuid": u}).One(&d)
+	if err == db.ErrNoMoreRows {
+		return err // не знайдено
+	}
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -179,9 +192,6 @@ func (r deviceRepository) mapDomainToInterfaceUpdate(updt, d domain.Device) map[
 	return result
 }
 
-
-
-
 func (r deviceRepository) mapUpdateToDomain(updt domain.Device, d domain.Device) domain.Device {
 	if updt.SerialNumber != "" {
 		d.SerialNumber = updt.SerialNumber
@@ -198,10 +208,10 @@ func (r deviceRepository) mapUpdateToDomain(updt domain.Device, d domain.Device)
 	if updt.PowerConsumption != nil {
 		d.PowerConsumption = updt.PowerConsumption
 	}
-	if updt.Category == domain.ACTUATOR{
+	if updt.Category == domain.ACTUATOR {
 		d.Units = nil
 	}
-	if updt.Category == domain.SENSOR{
+	if updt.Category == domain.SENSOR {
 		d.PowerConsumption = nil
 	}
 	d.UpdatedDate = time.Now()

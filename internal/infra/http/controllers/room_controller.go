@@ -56,7 +56,7 @@ func (c RoomController) FindList() http.HandlerFunc {
 			InternalServerError(w, err)
 			return
 		}
-		Success(w, resources.RoomDto{}.DomainToDtoCollection(rooms))
+		Success(w, resources.RoomDtoForList{}.DomainToDtoCollection(rooms))
 	}
 }
 

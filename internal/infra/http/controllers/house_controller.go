@@ -57,7 +57,6 @@ func (c HouseController) Update() http.HandlerFunc {
 
 		house := r.Context().Value(HouseKey).(domain.House)
 
-
 		house, err = c.houseService.Update(updt, house)
 		if err != nil {
 			log.Printf("HouseController.Update(c.houseService.Update): %s", err)
@@ -74,7 +73,6 @@ func (c HouseController) Update() http.HandlerFunc {
 func (c HouseController) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		house := r.Context().Value(HouseKey).(domain.House)
-
 
 		err := c.houseService.Delete(house.Id)
 		if err != nil {
@@ -115,6 +113,6 @@ func (c HouseController) FindList() http.HandlerFunc {
 			InternalServerError(w, err)
 		}
 
-		Success(w, resources.HouseDto{}.DomainToDtoCollection(houses))
+		Success(w, resources.HouseDtoForList{}.DomainToDtoCollectionForList(houses))
 	}
 }
