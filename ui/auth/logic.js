@@ -33,9 +33,8 @@ document.getElementById("login-form").addEventListener("submit", async function 
   const data = await res.json();
   localStorage.setItem("token", data.token); // Зберігаємо токен у браузері
 
-  alert("Вхід успішний!");
-  // Можна перенаправити користувача на іншу сторінку
-  // window.location.href = "/dashboard.html";
+  // ✅ Перенаправлення на головну сторінку
+  window.location.href = "/homepage";
 });
 
 // Реєстрація

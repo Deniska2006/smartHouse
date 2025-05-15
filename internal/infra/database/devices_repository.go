@@ -31,7 +31,7 @@ type DeviceRepository interface {
 	Find(id uint64) (domain.Device, error)
 	Update(updt domain.Device, d domain.Device) (domain.Device, error)
 	Delete(dId uint64) error
-	FindDeviceByUUID(u uuid.UUID) error
+	FindDeviceByUUID(u uuid.UUID) (domain.Device, error)
 }
 
 type deviceRepository struct {
@@ -105,16 +105,17 @@ func (r deviceRepository) Delete(dId uint64) error {
 	return nil
 }
 
-func (r deviceRepository) FindDeviceByUUID(u uuid.UUID) error {
-	var d domain.Device
-	err := r.coll.Find(db.Cond{"uuid": u}).One(&d)
-	if err == db.ErrNoMoreRows {
-		return err // не знайдено
-	}
+func (r deviceRepository) FindDeviceByUUID(u uuid.UUID) (domain.Device, error) {
+	var d device
+	err := r.coll.
+		Find(db.Cond{
+			"uuid":         u,
+			"deleted_date": nil}).One(&d)
 	if err != nil {
-		return err
+		return domain.Device{}, err
 	}
-	return nil
+
+	return r.mapModelToDomain(d), nil
 }
 
 func (r deviceRepository) mapDomainToModel(d domain.Device) device {

@@ -29,13 +29,15 @@ func (c MeasurementController) Save() http.HandlerFunc {
 			return
 		}
 
-		err = c.measService.FindDeviceByUUID(meas.DeviceUUID)
+		device, err := c.measService.FindDeviceByUUID(meas.DeviceUUID)
 
 		if err != nil {
 			log.Printf("MeasurementController.FindDeviceByUUID(c.measService:FindDeviceByUUID): %s", err)
 			BadRequest(w, errors.New("Device doesnt exist or acces denied"))
 			return
 		}
+
+		meas.RoomId = device.RoomId
 
 		err = c.measService.Save(meas)
 		if err != nil {

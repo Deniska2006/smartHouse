@@ -10,7 +10,7 @@ import (
 
 type MeasurementService interface {
 	Save(m domain.Measurement) error
-	FindDeviceByUUID(u uuid.UUID) error
+	FindDeviceByUUID(u uuid.UUID) (domain.Device, error)
 }
 
 type measurementService struct {
@@ -35,12 +35,12 @@ func (s measurementService) Save(m domain.Measurement) error {
 	return nil
 }
 
-func (s measurementService) FindDeviceByUUID(u uuid.UUID) error {
-	err := s.deviceRepo.FindDeviceByUUID(u)
+func (s measurementService) FindDeviceByUUID(u uuid.UUID) (domain.Device, error) {
+	device, err := s.deviceRepo.FindDeviceByUUID(u)
 	if err != nil {
 		log.Printf("measurementService.FindDeviceByUUID(s.measRepo.FindDeviceByUUID): %s", err)
-		return err
+		return domain.Device{}, err
 	}
 
-	return nil
+	return device, nil
 }

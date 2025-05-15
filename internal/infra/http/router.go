@@ -43,6 +43,8 @@ func Router(cont container.Container) http.Handler {
 				apiRouter.Route("/auth", func(apiRouter chi.Router) {
 					AuthRouter(apiRouter, cont.AuthController, cont.AuthMw)
 				})
+
+				MeasurementRouter(apiRouter, cont.MeasurementConmtroller)
 			})
 
 			// Protected
@@ -53,7 +55,6 @@ func Router(cont container.Container) http.Handler {
 				HouseRouter(apiRouter, cont.HouseController, cont.HouseService)
 				RoomRouter(apiRouter, cont.RoomController, cont.HouseService, cont.RoomService)
 				DeviceRouter(apiRouter, cont.DeviceController, cont.HouseService, cont.RoomService, cont.DeviceService)
-				MeasurementRouter(apiRouter, cont.MeasurementConmtroller)
 
 				apiRouter.Handle("/*", NotFoundJSON())
 			})
@@ -66,8 +67,13 @@ func Router(cont container.Container) http.Handler {
 	// HTML сторінка авторизації: /auth/login
 	router.Get("/auth/login", func(w http.ResponseWriter, r *http.Request) {
 		workDir, _ := os.Getwd()
-		loginPage := filepath.Join(workDir, "ui", "site.html")
+		loginPage := filepath.Join(workDir, "ui", "auth", "site.html")
 		http.ServeFile(w, r, loginPage)
+	})
+	router.Get("/homepage", func(w http.ResponseWriter, r *http.Request) {
+		workDir, _ := os.Getwd()
+		homepage := filepath.Join(workDir, "ui", "homePage", "homepage.html")
+		http.ServeFile(w, r, homepage)
 	})
 
 	return router
