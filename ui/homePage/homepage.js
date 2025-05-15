@@ -1,32 +1,45 @@
-document.addEventListener("DOMContentLoaded", async () => {
-  const token = localStorage.getItem("token");
+document.addEventListener("DOMContentLoaded", () => {
+  const greetingEl = document.getElementById("greeting");
+  const housesListEl = document.getElementById("houses-list");
 
-  if (!token) {
-    window.location.href = "/auth/login";
-    return;
-  }
+  // Відображення імені користувача (якщо є)
+  const userName = localStorage.getItem("userName") || "користувачу";
+  greetingEl.textContent = `Вітаємо, ${userName}!`;
 
-  try {
-    const res = await fetch("/api/v1/users", {
-      headers: {
-        "Authorization": "Bearer " + token
-      }
-    });
-
+  // Запит приміщень з авторизацією
+  fetch("/api/v1/houses", {
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("token")
+    }
+  })
+  .then(res => {
     if (!res.ok) {
-      throw new Error("Неможливо завантажити дані користувача.");
+      throw new Error("Не вдалося отримати список приміщень");
+    }
+    return res.json();
+  })
+  .then(houses => {
+    if (houses.length === 0) {
+      housesListEl.innerHTML = "<p>Список приміщень порожній.</p>";
+      return;
     }
 
-    const user = await res.json();
-    document.getElementById("user-info").textContent =
-      `Ви увійшли як ${user.firstName} ${user.secondName} (${user.email})`;
-  } catch (err) {
-    alert("Помилка: " + err.message);
-    logout();
-  }
-});
+    housesListEl.innerHTML = ""; // Очистити перед додаванням
 
-function logout() {
-  localStorage.removeItem("token");
-  window.location.href = "/auth/login";
-}
+    houses.forEach(house => {
+      const card = document.createElement("div");
+      card.className = "house-card";
+      card.innerHTML = `
+        <h3>${house.name}</h3>
+        <p><strong>Місто:</strong> ${house.city}</p>
+        <p><strong>Адреса:</strong> ${house.address}</p>
+        <p><strong>Опис:</strong> ${house.description}</p>
+      `;
+      housesListEl.appendChild(card);
+    });
+  })
+  .catch(err => {
+    housesListEl.innerHTML = `<p style="color: red;">${err.message}</p>`;
+    console.error(err);
+  });
+});

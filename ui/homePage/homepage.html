@@ -2,14 +2,15 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8" />
-  <title>RemoteHand — Головна</title>
-  <link rel="stylesheet" href="/ui/homePage/homepage.css" />
+  <title>RemoteHand - Головна</title>
+  <link href="/ui/homePage/homepage.css" rel="stylesheet" />
 </head>
 <body>
   <div class="container">
-    <h1>Вітаємо в RemoteHand!</h1>
-    <p id="user-info">Завантаження даних користувача...</p>
-    <button onclick="logout()">Вийти</button>
+    <h1 id="greeting">Вітаємо!</h1>
+    <div id="houses-list" class="houses-list">
+      <!-- Тут будуть карти приміщень -->
+    </div>
   </div>
 
   <script src="/ui/homePage/homepage.js" defer></script>
