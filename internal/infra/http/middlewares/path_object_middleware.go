@@ -46,3 +46,4 @@ func PathObject(pathKey string, ctxKey controllers.CtxKey, service Findable) fun
 		return http.HandlerFunc(hfn)
 	}
 }
+ 

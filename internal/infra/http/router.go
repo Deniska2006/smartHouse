@@ -44,7 +44,8 @@ func Router(cont container.Container) http.Handler {
 					AuthRouter(apiRouter, cont.AuthController, cont.AuthMw)
 				})
 
-				MeasurementRouter(apiRouter, cont.MeasurementConmtroller)
+				MeasurementRouter(apiRouter, cont.MeasurementController)
+				EventRouter(apiRouter, cont.EventController)
 			})
 
 			// Protected
@@ -203,6 +204,15 @@ func MeasurementRouter(r chi.Router, mc controllers.MeasurementController) {
 		apiRouter.Post(
 			"/",
 			mc.Save(),
+		)
+	})
+}
+
+func EventRouter(r chi.Router, ec controllers.EventController) {
+	r.Route("/events", func(apiRouter chi.Router) {
+		apiRouter.Post(
+			"/",
+			ec.Save(),
 		)
 	})
 }

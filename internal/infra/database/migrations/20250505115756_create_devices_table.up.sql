@@ -12,3 +12,4 @@ CREATE TABLE IF NOT EXISTS public.devices (
     updated_date TIMESTAMPTZ NOT NULL,
     deleted_date TIMESTAMPTZ
 );
+

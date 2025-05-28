@@ -46,4 +46,27 @@ h1#greeting {
   margin: 5px 0;
   font-size: 14px;
 }
-  
+
+button {
+  background-color: #0078d7;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #005fa3;
+}
+
+button:active {
+  background-color: #00497a;
+}
+
+button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 120, 215, 0.5);
+}

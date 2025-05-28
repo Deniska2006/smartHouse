@@ -11,6 +11,8 @@ import (
 type MeasurementService interface {
 	Save(m domain.Measurement) error
 	FindDeviceByUUID(u uuid.UUID) (domain.Device, error)
+	Find(id uint64) (interface{}, error)
+	FindById(id uint64) (domain.Measurement, error)
 }
 
 type measurementService struct {
@@ -35,6 +37,27 @@ func (s measurementService) Save(m domain.Measurement) error {
 	return nil
 }
 
+func (s measurementService) Find(id uint64) (interface{}, error) {
+
+	measurement, err := s.measRepo.Find(id)
+	if err != nil {
+		log.Printf("measurementService.Find(s.measRepo.Find): %s", err)
+		return domain.Measurement{}, err
+	}
+
+	return measurement, nil
+}
+
+func (s measurementService) FindById(id uint64) (domain.Measurement, error) {
+
+	measurement, err := s.measRepo.Find(id)
+	if err != nil {
+		log.Printf("measurementService.Find(s.measRepo.Find): %s", err)
+		return domain.Measurement{}, err
+	}
+
+	return measurement, nil
+}
 func (s measurementService) FindDeviceByUUID(u uuid.UUID) (domain.Device, error) {
 	device, err := s.deviceRepo.FindDeviceByUUID(u)
 	if err != nil {

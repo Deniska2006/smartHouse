@@ -6,11 +6,11 @@ import (
 	"github.com/google/uuid"
 )
 
-type Measurement struct {
+type Event struct {
 	Id          uint64
 	RoomId      uint64
 	DeviceId    uint64
 	DeviceUUID  uuid.UUID
-	Value       string
+	Action      string
 	CreatedDate time.Time
 }

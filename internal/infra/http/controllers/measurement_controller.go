@@ -38,6 +38,7 @@ func (c MeasurementController) Save() http.HandlerFunc {
 		}
 
 		meas.RoomId = device.RoomId
+		meas.DeviceId = device.Id
 
 		err = c.measService.Save(meas)
 		if err != nil {
@@ -48,3 +49,19 @@ func (c MeasurementController) Save() http.HandlerFunc {
 
 	}
 }
+
+// func (c MeasurementController) Find() http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		meas := r.Context().Value(MeasurementKey).(domain.Measurement)
+
+// 		meas, err := c.measService.FindById(meas.Id)
+// 		if err != nil {
+// 			log.Printf("Error,c.MeasurementController.Find().FindbyId(): %s", err)
+// 			return
+// 		}
+
+// 		var MeasurementDto resources.Mea
+// 		houseDto = houseDto.DomainToDto(house)
+// 		Success(w, houseDto)
+// 	}
+// }

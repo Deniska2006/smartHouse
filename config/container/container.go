@@ -38,7 +38,8 @@ type Controllers struct {
 	HouseController        controllers.HouseController
 	RoomController         controllers.RoomController
 	DeviceController       controllers.DeviceController
-	MeasurementConmtroller controllers.MeasurementController
+	MeasurementController controllers.MeasurementController
+	EventController        controllers.EventController
 }
 
 func New(conf config.Configuration) Container {
@@ -51,13 +52,15 @@ func New(conf config.Configuration) Container {
 	roomRepository := database.NewRoomRepository(sess)
 	deviceRepository := database.NewDeviceRepository(sess)
 	measurementRepositry := database.NewMeasurementRepository(sess)
+	eventRepository := database.NewEventRepository(sess)
 
 	userService := app.NewUserService(userRepository)
 	authService := app.NewAuthService(sessionRepository, userRepository, tknAuth, conf.JwtTTL)
 	houseService := app.NewHouseService(houseRepository, roomRepository)
 	roomService := app.NewRoomService(roomRepository, deviceRepository)
 	deviceService := app.NewDeviceService(deviceRepository)
-	measurementService := app.NewMeasurementService(measurementRepositry,deviceRepository)
+	measurementService := app.NewMeasurementService(measurementRepositry, deviceRepository)
+	eventService := app.NewEventtService(eventRepository,deviceRepository)
 
 	authController := controllers.NewAuthController(authService, userService)
 	userController := controllers.NewUserController(userService, authService)
@@ -65,6 +68,7 @@ func New(conf config.Configuration) Container {
 	roomController := controllers.NewRoomController(roomService)
 	deviceController := controllers.NewDeviceController(deviceService)
 	measurementController := controllers.NewMeasurementController(measurementService)
+	eventController := controllers.NewEventController(eventService)
 
 	authMiddleware := middlewares.AuthMiddleware(tknAuth, authService, userService)
 
@@ -86,6 +90,7 @@ func New(conf config.Configuration) Container {
 			roomController,
 			deviceController,
 			measurementController,
+			eventController,
 		},
 	}
 }
