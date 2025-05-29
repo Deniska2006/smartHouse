@@ -23,11 +23,12 @@ type DeviceDto struct {
 }
 
 type DeviceDtoForList struct {
-	SerialNumber     string     `json:"serialNumber"`
-	Characteristics  *string    `json:"characteristics,omitempty"`
-	Category         string     `json:"category"`
-	Units            *string    `json:"units,omitempty"`
-	PowerConsumption *string    `json:"power_consumption,omitempty"`
+	Id               uint64  `json:"id"`
+	SerialNumber     string  `json:"serialNumber"`
+	Characteristics  *string `json:"characteristics,omitempty"`
+	Category         string  `json:"category"`
+	Units            *string `json:"units,omitempty"`
+	PowerConsumption *string `json:"power_consumption,omitempty"`
 }
 
 func (d DeviceDto) DomainToDto(r domain.Device) DeviceDto {
@@ -49,6 +50,7 @@ func (d DeviceDto) DomainToDto(r domain.Device) DeviceDto {
 
 func (d DeviceDtoForList) DomainToDto(r domain.Device) DeviceDtoForList {
 	return DeviceDtoForList{
+		Id:               r.Id,
 		SerialNumber:     r.SerialNumber,
 		Characteristics:  r.Characteristics,
 		Category:         r.Category,

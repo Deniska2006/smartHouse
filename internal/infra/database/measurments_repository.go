@@ -49,9 +49,7 @@ func (r measurementRepository) Save(m domain.Measurement) error {
 func (r measurementRepository) Find(id uint64) (domain.Measurement, error) {
 	var m measurement
 	err := r.coll.
-		Find(db.Cond{
-			"id":           id,
-			"deleted_date": nil}).One(&m)
+		Find(db.Cond{"id": id}).One(&m)
 	if err != nil {
 		return domain.Measurement{}, err
 	}

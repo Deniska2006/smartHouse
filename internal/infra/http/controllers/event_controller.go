@@ -8,6 +8,7 @@ import (
 	"github.com/BohdanBoriak/boilerplate-go-back/internal/app"
 	"github.com/BohdanBoriak/boilerplate-go-back/internal/domain"
 	"github.com/BohdanBoriak/boilerplate-go-back/internal/infra/http/requests"
+	"github.com/BohdanBoriak/boilerplate-go-back/internal/infra/http/resources"
 )
 
 type EventController struct {
@@ -46,6 +47,15 @@ func (c EventController) Save() http.HandlerFunc {
 			InternalServerError(w, err)
 			return
 		}
-		
+
+	}
+}
+
+func (c EventController) Find() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		event := r.Context().Value(EventKey).(domain.Event)
+		var EventDto resources.EventDto
+		EventDto = EventDto.DomainToDto(event)
+		Success(w, EventDto)
 	}
 }

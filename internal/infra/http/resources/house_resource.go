@@ -22,6 +22,7 @@ type HouseDto struct {
 }
 
 type HouseDtoForList struct {
+	Id          uint64  `json:"id"`
 	Name        string  `json:"name"`
 	Description *string `json:"description,omitempty"`
 	City        string  `json:"city"`
@@ -51,6 +52,7 @@ func (d HouseDto) DomainToDto(h domain.House) HouseDto {
 
 func (d HouseDtoForList) DomainToDtoForList(h domain.House) HouseDtoForList {
 	return HouseDtoForList{
+		Id:          h.Id,
 		Name:        h.Name,
 		Description: h.Description,
 		City:        h.City,

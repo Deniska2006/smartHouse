@@ -44,8 +44,8 @@ func Router(cont container.Container) http.Handler {
 					AuthRouter(apiRouter, cont.AuthController, cont.AuthMw)
 				})
 
-				MeasurementRouter(apiRouter, cont.MeasurementController)
-				EventRouter(apiRouter, cont.EventController)
+				MeasurementRouter(apiRouter, cont.MeasurementController, cont.MeasurementService)
+				EventRouter(apiRouter, cont.EventController, cont.EventService)
 			})
 
 			// Protected
@@ -199,20 +199,30 @@ func DeviceRouter(r chi.Router, dc controllers.DeviceController, hs app.HouseSer
 
 }
 
-func MeasurementRouter(r chi.Router, mc controllers.MeasurementController) {
+func MeasurementRouter(r chi.Router, mc controllers.MeasurementController, ms app.MeasurementService) {
+	mpom := middlewares.PathObject("measurementId", controllers.MeasurementKey, ms)
 	r.Route("/measurements", func(apiRouter chi.Router) {
 		apiRouter.Post(
 			"/",
 			mc.Save(),
 		)
+		apiRouter.With(mpom).Get(
+			"/{measurementId}",
+			mc.Find(),
+		)
 	})
 }
 
-func EventRouter(r chi.Router, ec controllers.EventController) {
+func EventRouter(r chi.Router, ec controllers.EventController, es app.EventService) {
+	epom := middlewares.PathObject("eventId", controllers.EventKey, es)
 	r.Route("/events", func(apiRouter chi.Router) {
 		apiRouter.Post(
 			"/",
 			ec.Save(),
+		)
+		apiRouter.With(epom).Get(
+			"/{eventId}",
+			ec.Find(),
 		)
 	})
 }

@@ -18,6 +18,7 @@ type RoomDto struct {
 }
 
 type RoomDtoForList struct {
+	Id          uint64  `json:"id"`
 	Name        string  `json:"name"`
 	Description *string `json:"description,omitempty"`
 }
@@ -37,6 +38,7 @@ func (d RoomDto) DomainToDto(r domain.Room) RoomDto {
 
 func (d RoomDtoForList) DomainToDto(r domain.Room) RoomDtoForList {
 	return RoomDtoForList{
+		Id:          r.Id,
 		Name:        r.Name,
 		Description: r.Description,
 	}

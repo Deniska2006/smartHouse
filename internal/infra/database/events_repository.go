@@ -19,6 +19,7 @@ type event struct {
 
 type EventRepository interface {
 	Save(e domain.Event) error
+	Find(id uint64) (domain.Event, error)
 }
 
 type eventRepository struct {
@@ -45,8 +46,29 @@ func (r eventRepository) Save(e domain.Event) error {
 	return nil
 }
 
+func (r eventRepository) Find(id uint64) (domain.Event, error) {
+	var e event
+	err := r.coll.
+		Find(db.Cond{"id": id}).One(&e)
+	if err != nil {
+		return domain.Event{}, err
+	}
+
+	return r.mapModelToDomain(e), nil
+}
+
 func (r eventRepository) mapDomainToModel(e domain.Event) event {
 	return event{
+		Id:          e.Id,
+		DeviceId:    e.DeviceId,
+		RoomId:      e.RoomId,
+		Action:      e.Action,
+		CreatedDate: e.CreatedDate,
+	}
+}
+
+func (r eventRepository) mapModelToDomain(e event) domain.Event {
+	return domain.Event{
 		Id:          e.Id,
 		DeviceId:    e.DeviceId,
 		RoomId:      e.RoomId,

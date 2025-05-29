@@ -30,16 +30,18 @@ type Services struct {
 	app.HouseService
 	app.RoomService
 	app.DeviceService
+	app.MeasurementService
+	app.EventService
 }
 
 type Controllers struct {
-	AuthController         controllers.AuthController
-	UserController         controllers.UserController
-	HouseController        controllers.HouseController
-	RoomController         controllers.RoomController
-	DeviceController       controllers.DeviceController
+	AuthController        controllers.AuthController
+	UserController        controllers.UserController
+	HouseController       controllers.HouseController
+	RoomController        controllers.RoomController
+	DeviceController      controllers.DeviceController
 	MeasurementController controllers.MeasurementController
-	EventController        controllers.EventController
+	EventController       controllers.EventController
 }
 
 func New(conf config.Configuration) Container {
@@ -60,7 +62,7 @@ func New(conf config.Configuration) Container {
 	roomService := app.NewRoomService(roomRepository, deviceRepository)
 	deviceService := app.NewDeviceService(deviceRepository)
 	measurementService := app.NewMeasurementService(measurementRepositry, deviceRepository)
-	eventService := app.NewEventtService(eventRepository,deviceRepository)
+	eventService := app.NewEventtService(eventRepository, deviceRepository)
 
 	authController := controllers.NewAuthController(authService, userService)
 	userController := controllers.NewUserController(userService, authService)
@@ -82,6 +84,8 @@ func New(conf config.Configuration) Container {
 			houseService,
 			roomService,
 			deviceService,
+			measurementService,
+			eventService,
 		},
 		Controllers: Controllers{
 			authController,

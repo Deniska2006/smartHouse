@@ -8,6 +8,7 @@ import (
 	"github.com/BohdanBoriak/boilerplate-go-back/internal/app"
 	"github.com/BohdanBoriak/boilerplate-go-back/internal/domain"
 	"github.com/BohdanBoriak/boilerplate-go-back/internal/infra/http/requests"
+	"github.com/BohdanBoriak/boilerplate-go-back/internal/infra/http/resources"
 )
 
 type MeasurementController struct {
@@ -50,18 +51,11 @@ func (c MeasurementController) Save() http.HandlerFunc {
 	}
 }
 
-// func (c MeasurementController) Find() http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		meas := r.Context().Value(MeasurementKey).(domain.Measurement)
-
-// 		meas, err := c.measService.FindById(meas.Id)
-// 		if err != nil {
-// 			log.Printf("Error,c.MeasurementController.Find().FindbyId(): %s", err)
-// 			return
-// 		}
-
-// 		var MeasurementDto resources.Mea
-// 		houseDto = houseDto.DomainToDto(house)
-// 		Success(w, houseDto)
-// 	}
-// }
+func (c MeasurementController) Find() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		meas := r.Context().Value(MeasurementKey).(domain.Measurement)
+		var MeasurementDto resources.MeasurementDto
+		MeasurementDto = MeasurementDto.DomainToDto(meas)
+		Success(w, MeasurementDto)
+	}
+}

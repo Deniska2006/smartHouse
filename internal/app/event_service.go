@@ -11,6 +11,7 @@ import (
 type EventService interface {
 	Save(e domain.Event) error
 	FindDeviceByUUID(u uuid.UUID) (domain.Device, error)
+	Find(id uint64) (interface{}, error)
 }
 
 type eventService struct {
@@ -38,9 +39,19 @@ func (s eventService) Save(e domain.Event) error {
 func (s eventService) FindDeviceByUUID(u uuid.UUID) (domain.Device, error) {
 	device, err := s.deviceRepo.FindDeviceByUUID(u)
 	if err != nil {
-		log.Printf("measurementService.FindDeviceByUUID(s.measRepo.FindDeviceByUUID): %s", err)
+		log.Printf("eventService.FindDeviceByUUID(s.deviceRepo.FindDeviceByUUID): %s", err)
 		return domain.Device{}, err
 	}
 
 	return device, nil
+}
+
+func (s eventService) Find(id uint64) (interface{}, error) {
+	event, err := s.eventRepo.Find(id)
+	if err != nil {
+		log.Printf("eventService.FindDeviceByUUID(s.eventRepo.Find): %s", err)
+		return domain.Event{}, err
+	}
+
+	return event, nil
 }
