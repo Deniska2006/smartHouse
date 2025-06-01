@@ -11,6 +11,7 @@ type RoomService interface {
 	Save(rm domain.Room) (domain.Room, error)
 	FindList(hId uint64) ([]domain.Room, error)
 	Find(id uint64) (interface{}, error)
+	Find2(id uint64) (domain.Room, error)
 	Update(updt domain.Room, rm domain.Room) (domain.Room, error)
 	Delete(rId uint64) error
 	FindDevices(rid uint64) ([]domain.Device, error)
@@ -52,7 +53,17 @@ func (s roomService) Find(id uint64) (interface{}, error) {
 	room, err := s.roomRepo.Find(id)
 	if err != nil {
 		log.Printf("roomService.Find(s.roomRepo.Find): %s", err)
-		return domain.House{}, err
+		return domain.Room{}, err
+	}
+
+	return room, nil
+}
+
+func (s roomService) Find2(id uint64) (domain.Room, error) {
+	room, err := s.roomRepo.Find(id)
+	if err != nil {
+		log.Printf("roomService.Find(s.roomRepo.Find): %s", err)
+		return domain.Room{}, err
 	}
 
 	return room, nil

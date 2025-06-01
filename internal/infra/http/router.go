@@ -195,6 +195,10 @@ func DeviceRouter(r chi.Router, dc controllers.DeviceController, hs app.HouseSer
 			"/{deviceId}",
 			dc.Delete(),
 		)
+		apiRouter.With(hpom, rpom, dpom, middlewares.IsOwner()).Patch(
+			"/{deviceId}",
+			dc.Move(),
+		)
 	})
 
 }

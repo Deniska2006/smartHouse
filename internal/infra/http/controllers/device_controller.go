@@ -14,11 +14,15 @@ import (
 
 type DeviceController struct {
 	deviceService app.DeviceService
+	houseService  app.HouseService
+	roomService   app.RoomService
 }
 
-func NewDeviceController(dvc app.DeviceService) DeviceController {
+func NewDeviceController(dvc app.DeviceService, hs app.HouseService, rs app.RoomService) DeviceController {
 	return DeviceController{
 		deviceService: dvc,
+		houseService:  hs,
+		roomService:   rs,
 	}
 }
 
@@ -78,6 +82,7 @@ func (c DeviceController) Find() http.HandlerFunc {
 
 func (c DeviceController) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		updt, err := requests.Bind(r, requests.UpdateDeviceRequest{}, domain.Device{})
 		if err != nil {
 			log.Printf("DeviceController.Update(requests.Bind): %s", err)
@@ -102,6 +107,56 @@ func (c DeviceController) Update() http.HandlerFunc {
 
 		Success(w, resources.DeviceDto{}.DomainToDto(device))
 	}
+}
+
+func (c DeviceController) Move() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		oldHouse := r.Context().Value(HouseKey).(domain.House)
+		updt, err := requests.Bind(r, requests.MoveDeviceRequest{}, domain.Device{})
+		if err != nil {
+			log.Printf("DeviceController.Move(requests.Bind): %s", err)
+			BadRequest(w, errors.New("invalid request body"))
+			return
+		}
+		err = c.IsMoveValid(updt.HouseId, updt.RoomId, oldHouse)
+		if err != nil {
+			log.Printf("DeviceController.Move( c.IsMoveValid): %s", err)
+			BadRequest(w, err)
+			return
+		}
+
+		device := r.Context().Value(DeviceKey).(domain.Device)
+
+		err = c.deviceService.Move(updt.HouseId, updt.RoomId, device.Id)
+		if err != nil {
+			log.Printf("DeviceController.Move(c.deviceService.Move): %s", err)
+			InternalServerError(w, err)
+			return
+		}
+
+		Success(w, resources.Message{Response: "Device was moved"})
+	}
+}
+
+func (c DeviceController) IsMoveValid(hId uint64, rId uint64, oldHouse domain.House) error {
+
+	movedRoom, err := c.roomService.Find2(rId)
+	if err != nil {
+		return err
+	}
+
+	movedHouse, err := c.houseService.Find2(hId)
+	if err != nil {
+		return err
+	}
+
+	if movedHouse.UserId != oldHouse.UserId {
+		return errors.New("You are not the owner of this house")
+	}
+	if movedRoom.HouseId != movedHouse.Id {
+		return errors.New("This house doesn't contain this room")
+	}
+	return nil
 }
 
 func (c DeviceController) Delete() http.HandlerFunc {

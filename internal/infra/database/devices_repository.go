@@ -32,6 +32,7 @@ type DeviceRepository interface {
 	Update(updt domain.Device, d domain.Device) (domain.Device, error)
 	Delete(dId uint64) error
 	FindDeviceByUUID(u uuid.UUID) (domain.Device, error)
+	Move(hId uint64, rId uint64, dId uint64) error
 }
 
 type deviceRepository struct {
@@ -97,6 +98,18 @@ func (r deviceRepository) Update(updt domain.Device, d domain.Device) (domain.De
 func (r deviceRepository) Delete(dId uint64) error {
 	err := r.coll.Find(db.Cond{"id": dId}).Update(map[string]interface{}{
 		"deleted_date": time.Now(),
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r deviceRepository) Move(hId uint64, rId uint64, dId uint64) error {
+	err := r.coll.Find(db.Cond{"id": dId}).Update(map[string]interface{}{
+		"house_id": hId,
+		"room_id":  rId,
 	})
 	if err != nil {
 		return err

@@ -11,8 +11,9 @@ type DeviceService interface {
 	Save(h domain.Device) (domain.Device, error)
 	FindList(rId uint64) ([]domain.Device, error)
 	Find(id uint64) (interface{}, error)
-	Update(updt domain.Device,d domain.Device) (domain.Device, error)
-	Delete(dId uint64) (error)
+	Update(updt domain.Device, d domain.Device) (domain.Device, error)
+	Move(hId uint64, rId uint64, dId uint64) error
+	Delete(dId uint64) error
 }
 
 type deviceService struct {
@@ -56,9 +57,9 @@ func (s deviceService) Find(id uint64) (interface{}, error) {
 	return device, nil
 }
 
-func (s deviceService) Update(updt domain.Device,d domain.Device) (domain.Device, error) {
+func (s deviceService) Update(updt domain.Device, d domain.Device) (domain.Device, error) {
 
-	device, err := s.deviceRepo.Update(updt,d)
+	device, err := s.deviceRepo.Update(updt, d)
 	if err != nil {
 		log.Printf("deviceService.Update(s.deviceRepo.Update): %s", err)
 		return domain.Device{}, err
@@ -67,7 +68,18 @@ func (s deviceService) Update(updt domain.Device,d domain.Device) (domain.Device
 	return device, nil
 }
 
-func (s deviceService) Delete(dId uint64) (error) {
+func (s deviceService) Move(hId uint64, rId uint64, dId uint64) error {
+
+	err := s.deviceRepo.Move(hId, rId, dId)
+	if err != nil {
+		log.Printf("deviceService.Move(s.deviceRepo.Move): %s", err)
+		return err
+	}
+
+	return nil
+}
+
+func (s deviceService) Delete(dId uint64) error {
 
 	err := s.deviceRepo.Delete(dId)
 	if err != nil {
@@ -75,5 +87,5 @@ func (s deviceService) Delete(dId uint64) (error) {
 		return err
 	}
 
-	return  nil
+	return nil
 }

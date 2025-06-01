@@ -11,11 +11,16 @@ type DeviceRequest struct {
 }
 
 type UpdateDeviceRequest struct {
-	SerialNumber     *string  `json:"serialNumber"`
+	SerialNumber     *string `json:"serialNumber"`
 	Characteristics  *string `json:"characteristics"`
-	Category         *string  `json:"category"`
+	Category         *string `json:"category"`
 	Units            *string `json:"units"`
 	PowerConsumption *string `json:"powerConsumption"`
+}
+
+type MoveDeviceRequest struct {
+	HouseId uint64 `json:"houseId"`
+	RoomId  uint64 `json:"roomId"`
 }
 
 func (r DeviceRequest) ToDomainModel() (interface{}, error) {
@@ -28,13 +33,20 @@ func (r DeviceRequest) ToDomainModel() (interface{}, error) {
 	}, nil
 }
 
-func (r UpdateDeviceRequest) ToDomainModel() (interface{}, error) {
-	var serialNumber,category string
+func (r MoveDeviceRequest) ToDomainModel() (interface{}, error) {
+	return domain.Device{
+		HouseId: r.HouseId,
+		RoomId:  r.RoomId,
+	}, nil
+}
 
-	if r.SerialNumber != nil{
+func (r UpdateDeviceRequest) ToDomainModel() (interface{}, error) {
+	var serialNumber, category string
+
+	if r.SerialNumber != nil {
 		serialNumber = *r.SerialNumber
 	}
-	if r.Category != nil{
+	if r.Category != nil {
 		category = *r.Category
 	}
 
