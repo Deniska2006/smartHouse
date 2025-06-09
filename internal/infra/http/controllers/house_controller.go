@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/BohdanBoriak/boilerplate-go-back/internal/app"
 	"github.com/BohdanBoriak/boilerplate-go-back/internal/domain"
@@ -107,12 +108,38 @@ func (c HouseController) FindList() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user := r.Context().Value(UserKey).(domain.User)
 
+		var pg domain.Pagination
+		var err error
+
+		pg.Page, err = strconv.ParseUint(r.URL.Query().Get("page"), 10, 64)
+		if err != nil || pg.Page < 1 {
+			BadRequest(w, errors.New("Invalid 'page' parameter"))
+			return
+		}
+		pg.CountPerPage, err = strconv.ParseUint(r.URL.Query().Get("count"), 10, 64)
+		if err != nil || pg.CountPerPage == 0 {
+			BadRequest(w, errors.New("Invalid 'count' parameter"))
+			return
+		}
+
 		houses, err := c.houseService.FindList(user.Id)
 		if err != nil {
 			log.Printf("(HouseController) FindList( c.houseService.FindList(user.Id)): %s", err)
 			InternalServerError(w, err)
 		}
 
-		Success(w, resources.HouseDtoForList{}.DomainToDtoCollectionForList(houses))
+		start := pg.CountPerPage*pg.Page - pg.CountPerPage
+		end := pg.CountPerPage * pg.Page
+
+		if start > uint64(len(houses)) {
+			validationError(w, errors.New("InvalidPage"))
+		} else if end > uint64(len(houses)) {
+			houses = houses[start:]
+			Success(w, resources.HouseDtoForList{}.DomainToDtoCollectionForList(houses))
+		} else {
+			houses = houses[start:end]
+			Success(w, resources.HouseDtoForList{}.DomainToDtoCollectionForList(houses))
+		}
+
 	}
 }
