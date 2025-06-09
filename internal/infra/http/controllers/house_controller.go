@@ -131,7 +131,7 @@ func (c HouseController) FindList() http.HandlerFunc {
 		start := pg.CountPerPage*pg.Page - pg.CountPerPage
 		end := pg.CountPerPage * pg.Page
 
-		if start > uint64(len(houses)) {
+		if start >= uint64(len(houses)) {
 			validationError(w, errors.New("InvalidPage"))
 		} else if end > uint64(len(houses)) {
 			houses = houses[start:]

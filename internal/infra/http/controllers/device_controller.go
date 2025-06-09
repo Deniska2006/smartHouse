@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/BohdanBoriak/boilerplate-go-back/internal/app"
 	"github.com/BohdanBoriak/boilerplate-go-back/internal/domain"
@@ -63,6 +64,20 @@ func (c DeviceController) Save() http.HandlerFunc {
 func (c DeviceController) FindList() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
+		var pg domain.Pagination
+		var err error
+
+		pg.Page, err = strconv.ParseUint(r.URL.Query().Get("page"), 10, 64)
+		if err != nil || pg.Page < 1 {
+			BadRequest(w, errors.New("Invalid 'page' parameter"))
+			return
+		}
+		pg.CountPerPage, err = strconv.ParseUint(r.URL.Query().Get("count"), 10, 64)
+		if err != nil || pg.CountPerPage == 0 {
+			BadRequest(w, errors.New("Invalid 'count' parameter"))
+			return
+		}
+
 		devices, err := c.deviceService.FindList(r.Context().Value(RoomKey).(domain.Room).Id)
 		if err != nil {
 			log.Printf("DeviceController.Save(c.deviceService.Save): %s", err)
@@ -70,7 +85,18 @@ func (c DeviceController) FindList() http.HandlerFunc {
 			return
 		}
 
-		Success(w, resources.DeviceDtoForList{}.DomainToDtoCollection(devices))
+		start := pg.CountPerPage*pg.Page - pg.CountPerPage
+		end := pg.CountPerPage * pg.Page
+
+		if start >= uint64(len(devices)) {
+			validationError(w, errors.New("InvalidPage"))
+		} else if end > uint64(len(devices)) {
+			devices = devices[start:]
+			Success(w, resources.DeviceDtoForList{}.DomainToDtoCollection(devices))
+		} else {
+			devices = devices[start:end]
+			Success(w, resources.DeviceDtoForList{}.DomainToDtoCollection(devices))
+		}
 	}
 }
 

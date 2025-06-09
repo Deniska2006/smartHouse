@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/BohdanBoriak/boilerplate-go-back/internal/app"
 	"github.com/BohdanBoriak/boilerplate-go-back/internal/domain"
@@ -48,6 +49,21 @@ func (c RoomController) Save() http.HandlerFunc {
 
 func (c RoomController) FindList() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		var pg domain.Pagination
+		var err error
+
+		pg.Page, err = strconv.ParseUint(r.URL.Query().Get("page"), 10, 64)
+		if err != nil || pg.Page < 1 {
+			BadRequest(w, errors.New("Invalid 'page' parameter"))
+			return
+		}
+		pg.CountPerPage, err = strconv.ParseUint(r.URL.Query().Get("count"), 10, 64)
+		if err != nil || pg.CountPerPage == 0 {
+			BadRequest(w, errors.New("Invalid 'count' parameter"))
+			return
+		}
+
 		house := r.Context().Value(HouseKey).(domain.House)
 
 		rooms, err := c.roomService.FindList(house.Id)
@@ -56,7 +72,19 @@ func (c RoomController) FindList() http.HandlerFunc {
 			InternalServerError(w, err)
 			return
 		}
-		Success(w, resources.RoomDtoForList{}.DomainToDtoCollection(rooms))
+
+		start := pg.CountPerPage*pg.Page - pg.CountPerPage
+		end := pg.CountPerPage * pg.Page
+
+		if start >= uint64(len(rooms)) {
+			validationError(w, errors.New("InvalidPage"))
+		} else if end > uint64(len(rooms)) {
+			rooms = rooms[start:]
+			Success(w, resources.RoomDtoForList{}.DomainToDtoCollection(rooms))
+		} else {
+			rooms = rooms[start:end]
+			Success(w, resources.RoomDtoForList{}.DomainToDtoCollection(rooms))
+		}
 	}
 }
 
