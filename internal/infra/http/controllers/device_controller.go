@@ -80,7 +80,7 @@ func (c DeviceController) FindList() http.HandlerFunc {
 
 		devices, err := c.deviceService.FindList(r.Context().Value(RoomKey).(domain.Room).Id)
 		if err != nil {
-			log.Printf("DeviceController.Save(c.deviceService.Save): %s", err)
+			log.Printf("DeviceController.FindList()(c.deviceService.FindList): %s", err)
 			InternalServerError(w, err)
 			return
 		}
@@ -135,6 +135,19 @@ func (c DeviceController) Update() http.HandlerFunc {
 	}
 }
 
+func (c DeviceController) Delete() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		err := c.deviceService.Delete(r.Context().Value(DeviceKey).(domain.Device).Id)
+		if err != nil {
+			log.Printf("DeviceController.Delete(c.deviceService.Delete): %s", err)
+			InternalServerError(w, err)
+			return
+		}
+		Success(w, resources.Message{Response: "Device was deleted"})
+	}
+}
+
 func (c DeviceController) Move() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		oldHouse := r.Context().Value(HouseKey).(domain.House)
@@ -183,19 +196,6 @@ func (c DeviceController) IsMoveValid(hId uint64, rId uint64, oldHouse domain.Ho
 		return errors.New("This house doesn't contain this room")
 	}
 	return nil
-}
-
-func (c DeviceController) Delete() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-
-		err := c.deviceService.Delete(r.Context().Value(DeviceKey).(domain.Device).Id)
-		if err != nil {
-			log.Printf("DeviceController.Delete(c.deviceService.Delete): %s", err)
-			InternalServerError(w, err)
-			return
-		}
-		Success(w, resources.Message{Response: "Device was deleted"})
-	}
 }
 
 func UpdateValid(updt, device domain.Device) bool {

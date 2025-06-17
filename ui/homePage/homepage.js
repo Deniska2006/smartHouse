@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
   housesListEl.before(createBtn); // Кнопка над списком
 
   // 📦 Отримуємо список будинків
-  fetch("/api/v1/houses", {
+  fetch("/api/v1/houses/?page=1&count=5", {
     headers: {
       "Authorization": "Bearer " + token
     }

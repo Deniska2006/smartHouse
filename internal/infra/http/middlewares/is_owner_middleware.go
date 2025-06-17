@@ -13,6 +13,11 @@ func IsOwner() func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			user := r.Context().Value(controllers.UserKey).(domain.User)
 			house := r.Context().Value(controllers.HouseKey).(domain.House)
+			if house.UserId != user.Id {
+				controllers.Forbidden(w, errors.New("Access denied: user doesn't own the house"))
+				return
+			}
+
 
 			roomCtx := r.Context().Value(controllers.RoomKey)
 			if roomCtx != nil {
@@ -33,11 +38,7 @@ func IsOwner() func(http.Handler) http.Handler {
 				}
 			}
 
-			if house.UserId != user.Id {
-				controllers.Forbidden(w, errors.New("Access denied: user doesn't own the house"))
-				return
-			}
-
+			
 			next.ServeHTTP(w, r)
 		})
 	}
